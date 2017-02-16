@@ -4,8 +4,10 @@ import pl.com.bottega.dms.model.commands.*;
 import pl.com.bottega.dms.model.numbers.NumberGenerator;
 import pl.com.bottega.dms.model.printing.PrintCostCalculator;
 
-import static pl.com.bottega.dms.model.DocumentStatus.DRAFT;
-import static pl.com.bottega.dms.model.DocumentStatus.VERIFIED;
+import java.time.LocalDateTime;
+
+import static java.time.LocalDateTime.now;
+import static pl.com.bottega.dms.model.DocumentStatus.*;
 
 public class Document {
 
@@ -13,30 +15,55 @@ public class Document {
     private DocumentStatus status;
     private String title;
     private String content;
+    private LocalDateTime creationDate;
+    private LocalDateTime lastVerificationDate;
+    private LocalDateTime publicationDate;
+    private LocalDateTime lastEditionDate;
+    private EmployeeId creatorId;
+    private EmployeeId lastVerificatorId;
+    private EmployeeId lastEditorId;
+    private EmployeeId publisherId;
 
     public Document(CreateDocumentCommand cmd, NumberGenerator numberGenerator) {
         this.status = DRAFT;
         this.number = numberGenerator.generate();
         this.title = cmd.getTitle();
+        this.creatorId = cmd.getCreatorId();
+        this.creationDate = now();
     }
 
 
     public void change(ChangeDocumentCommand cmd) {
+        if(status != DRAFT && status !=VERIFIED)
+            throw new DocumentStatusException();
+
         this.title = cmd.getTitle();
         this.content = cmd.getContent();
+        this.status = DRAFT;
+        this.lastEditorId = cmd.getEditorId();
+        this.lastEditionDate = now();
     }
 
-    public void verify() {
+    public void verify(EmployeeId verificatorId) {
+        if(status != DRAFT)
+            throw new DocumentStatusException();
 
         this.status = VERIFIED;
+        this.lastVerificatorId = verificatorId;
+        this.lastVerificationDate = now();
     }
 
     public void archive() {
-
+        this.status = ARCHIVED;
     }
 
     public void publish(PublishDocumentCommand cmd, PrintCostCalculator printCostCalculator) {
+        if(status != VERIFIED)
+            throw new DocumentStatusException();
 
+        this.status = PUBLISHED;
+        this.publisherId = cmd.getPublisherId();
+        this.publicationDate = now();
     }
 
     public void confirm(ConfirmDocumentCommand cmd) {
@@ -45,6 +72,10 @@ public class Document {
 
     public void confirmFor(ConfirmForDocumentCommand cmd) {
 
+    }
+
+    public void setStatus(DocumentStatus documentStatus) {
+        this.status = documentStatus;
     }
 
     public DocumentStatus getStatus() {
@@ -62,4 +93,37 @@ public class Document {
     public String getContent() {
         return content;
     }
+
+    public LocalDateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public LocalDateTime getLastVerificationDate() {
+        return lastVerificationDate;
+    }
+
+    public LocalDateTime getPublicationDate() {
+        return publicationDate;
+    }
+
+    public LocalDateTime getLastEditionDate() {
+        return lastEditionDate;
+    }
+
+    public EmployeeId getCreatorId() {
+        return creatorId;
+    }
+
+    public EmployeeId getLastVerificatorId() {
+        return lastVerificatorId;
+    }
+
+    public EmployeeId getLastEditorId() {
+        return lastEditorId;
+    }
+
+    public EmployeeId getPublisherId() {
+        return publisherId;
+    }
+
 }
