@@ -90,6 +90,7 @@ public class DocumentTest {
 
     @Test(expected = DocumentStatusException.class)
     public void shouldNotAllowVerifyingIfPublished() {
+        document.verify(employeeId);
         document.publish(publishDocumentCommand, printCostCalculator);
 
         document.verify(employeeId);
@@ -122,38 +123,30 @@ public class DocumentTest {
 
     @Test
     public void shouldRememberItsCreationDate() {
-        LocalDateTime creationDate = document.getCreationDate();
-        LocalDateTime expected = now();
 
-        assertSameTime(expected, creationDate);
+        assertSameTime(now(), document.getCreationDate());
     }
 
     @Test
     public void shouldRememberLastVerificationDate() {
         document.verify(employeeId);
-        LocalDateTime lastVerificationDate = document.getLastVerificationDate();
-        LocalDateTime expected = now();
 
-        assertSameTime(expected, lastVerificationDate);
+        assertSameTime(now(), document.getLastVerificationDate());
     }
 
     @Test
     public void shouldRememberItsPublicationDate() {
         document.verify(employeeId);
         document.publish(publishDocumentCommand, printCostCalculator);
-        LocalDateTime publicationDate = document.getPublicationDate();
-        LocalDateTime expected = now();
 
-        assertSameTime(expected, publicationDate);
+        assertSameTime(now(), document.getPublicationDate());
     }
 
     @Test
     public void shouldRememberLastEditionDate() {
         document.change(changeDocumentCommand);
-        LocalDateTime editionDate = document.getLastEditionDate();
-        LocalDateTime expected = now();
 
-        assertSameTime(expected, editionDate);
+        assertSameTime(now(), document.getLastEditionDate());
     }
 
     @Test
