@@ -2,9 +2,7 @@ package pl.com.bottega.dms.model;
 
 import org.junit.Before;
 import org.junit.Test;
-import pl.com.bottega.dms.model.commands.ChangeDocumentCommand;
-import pl.com.bottega.dms.model.commands.CreateDocumentCommand;
-import pl.com.bottega.dms.model.commands.PublishDocumentCommand;
+import pl.com.bottega.dms.model.commands.*;
 import pl.com.bottega.dms.model.numbers.NumberGenerator;
 import pl.com.bottega.dms.model.printing.PrintCostCalculator;
 
@@ -84,8 +82,15 @@ public class DocumentTest {
     }
 
     @Test(expected = DocumentStatusException.class)
-    public void shouldNotAllowVerifyingIfIsNotDraft() {
+    public void shouldNotAllowVerifyingIfVerified() {
         document.verify(employeeId);
+
+        document.verify(employeeId);
+    }
+
+    @Test(expected = DocumentStatusException.class)
+    public void shouldNotAllowVerifyingIfPublished() {
+        document.publish(publishDocumentCommand, printCostCalculator);
 
         document.verify(employeeId);
     }
@@ -109,7 +114,7 @@ public class DocumentTest {
     }
 
     @Test(expected = DocumentStatusException.class)
-    public void shouldNotAllowChangingIfNotDraftOrVerified() {
+    public void shouldNotAllowChangingIfPublished() {
         document.publish(publishDocumentCommand, printCostCalculator);
 
         document.change(changeDocumentCommand);
@@ -208,6 +213,22 @@ public class DocumentTest {
         document.archive();
 
         document.verify(employeeId);
+    }
+
+    @Test(expected = DocumentStatusException.class)
+    public void shouldNotAllowConfirmingIfArchived() {
+        ConfirmDocumentCommand confirmDocumentCommand = new ConfirmDocumentCommand();
+        document.archive();
+
+        document.confirm(confirmDocumentCommand);
+    }
+
+    @Test(expected = DocumentStatusException.class)
+    public void shouldNotAllowConfirmingForIfArchived() {
+        ConfirmForDocumentCommand confirmForDocumentCommand = new ConfirmForDocumentCommand();
+        document.archive();
+
+        document.confirmFor(confirmForDocumentCommand);
     }
 
     @Test(expected = DocumentStatusException.class)

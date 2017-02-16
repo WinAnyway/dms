@@ -34,7 +34,7 @@ public class Document {
 
 
     public void change(ChangeDocumentCommand cmd) {
-        if(status != DRAFT && status !=VERIFIED)
+        if (status != DRAFT && status != VERIFIED)
             throw new DocumentStatusException();
 
         this.title = cmd.getTitle();
@@ -45,7 +45,7 @@ public class Document {
     }
 
     public void verify(EmployeeId verificatorId) {
-        if(status != DRAFT)
+        if (status != DRAFT)
             throw new DocumentStatusException();
 
         this.status = VERIFIED;
@@ -58,7 +58,7 @@ public class Document {
     }
 
     public void publish(PublishDocumentCommand cmd, PrintCostCalculator printCostCalculator) {
-        if(status != VERIFIED)
+        if (status != VERIFIED)
             throw new DocumentStatusException();
 
         this.status = PUBLISHED;
@@ -67,11 +67,14 @@ public class Document {
     }
 
     public void confirm(ConfirmDocumentCommand cmd) {
+        if (status == ARCHIVED)
+            throw new DocumentStatusException();
 
     }
 
     public void confirmFor(ConfirmForDocumentCommand cmd) {
-
+        if (status == ARCHIVED)
+            throw new DocumentStatusException();
     }
 
     public DocumentStatus getStatus() {
