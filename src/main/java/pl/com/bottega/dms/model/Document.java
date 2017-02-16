@@ -74,10 +74,6 @@ public class Document {
 
     }
 
-    public void setStatus(DocumentStatus documentStatus) {
-        this.status = documentStatus;
-    }
-
     public DocumentStatus getStatus() {
         return status;
     }

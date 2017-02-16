@@ -92,7 +92,7 @@ public class DocumentTest {
 
     @Test
     public void shouldBeDraftAfterChanging() {
-        document.setStatus(VERIFIED);
+        document.verify(employeeId);
 
         document.change(changeDocumentCommand);
 
@@ -101,7 +101,7 @@ public class DocumentTest {
 
     @Test
     public void shouldBePublishedAfterPublishing() {
-        document.setStatus(VERIFIED);
+        document.verify(employeeId);
 
         document.publish(publishDocumentCommand, printCostCalculator);
 
@@ -110,7 +110,7 @@ public class DocumentTest {
 
     @Test(expected = DocumentStatusException.class)
     public void shouldNotAllowChangingIfNotDraftOrVerified() {
-        document.setStatus(PUBLISHED);
+        document.publish(publishDocumentCommand, printCostCalculator);
 
         document.change(changeDocumentCommand);
     }
@@ -134,7 +134,7 @@ public class DocumentTest {
 
     @Test
     public void shouldRememberItsPublicationDate() {
-        document.setStatus(VERIFIED);
+        document.verify(employeeId);
         document.publish(publishDocumentCommand, printCostCalculator);
         LocalDateTime publicationDate = document.getPublicationDate();
         LocalDateTime expected = now();
@@ -173,7 +173,7 @@ public class DocumentTest {
 
     @Test
     public void shouldRememberPublisherId() {
-        document.setStatus(VERIFIED);
+        document.verify(employeeId);
         publishDocumentCommand.setPublisherId(employeeId);
         document.publish(publishDocumentCommand, printCostCalculator);
 
@@ -189,7 +189,7 @@ public class DocumentTest {
 
     @Test(expected = DocumentStatusException.class)
     public void shouldNotAllowChangingIfArchived() {
-        document.setStatus(ARCHIVED);
+        document.archive();
 
         document.change(changeDocumentCommand);
     }
@@ -197,7 +197,7 @@ public class DocumentTest {
 
     @Test(expected = DocumentStatusException.class)
     public void shouldNotAllowPublishingIfArchived() {
-        document.setStatus(ARCHIVED);
+        document.archive();
 
         document.publish(publishDocumentCommand, printCostCalculator);
     }
@@ -205,7 +205,7 @@ public class DocumentTest {
 
     @Test(expected = DocumentStatusException.class)
     public void shouldNotAllowVerifyingIfArchived() {
-        document.setStatus(ARCHIVED);
+        document.archive();
 
         document.verify(employeeId);
     }
