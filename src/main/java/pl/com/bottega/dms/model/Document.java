@@ -6,7 +6,6 @@ import pl.com.bottega.dms.model.printing.PrintCostCalculator;
 
 import java.time.LocalDateTime;
 
-import static java.time.LocalDateTime.now;
 import static pl.com.bottega.dms.model.DocumentStatus.*;
 
 public class Document {
@@ -15,66 +14,59 @@ public class Document {
     private DocumentStatus status;
     private String title;
     private String content;
-    private LocalDateTime creationDate;
-    private LocalDateTime lastVerificationDate;
-    private LocalDateTime publicationDate;
-    private LocalDateTime lastEditionDate;
+    private LocalDateTime createdAt;
+    private LocalDateTime verifiedAt;
+    private LocalDateTime publishedAt;
+    private LocalDateTime changedAt;
     private EmployeeId creatorId;
-    private EmployeeId lastVerificatorId;
-    private EmployeeId lastEditorId;
+    private EmployeeId verifierId;
+    private EmployeeId editorId;
     private EmployeeId publisherId;
 
     public Document(CreateDocumentCommand cmd, NumberGenerator numberGenerator) {
-        this.status = DRAFT;
         this.number = numberGenerator.generate();
+        this.status = DRAFT;
         this.title = cmd.getTitle();
-        this.creatorId = cmd.getCreatorId();
-        this.creationDate = now();
+        this.createdAt = LocalDateTime.now();
+        this.creatorId = cmd.getEmployeeId();
     }
 
-
     public void change(ChangeDocumentCommand cmd) {
-        if (status != DRAFT && status != VERIFIED)
-            throw new DocumentStatusException();
-
+        if (!this.status.equals(DRAFT) && !this.status.equals(VERIFIED))
+            throw new DocumentStatusException("Document should be DRAFT or VERIFIED to PUBLISH");
         this.title = cmd.getTitle();
         this.content = cmd.getContent();
         this.status = DRAFT;
-        this.lastEditorId = cmd.getEditorId();
-        this.lastEditionDate = now();
+        this.changedAt = LocalDateTime.now();
+        this.editorId = cmd.getEmployeeId();
     }
 
-    public void verify(EmployeeId verificatorId) {
-        if (status != DRAFT)
-            throw new DocumentStatusException();
-
+    public void verify(EmployeeId employeeId) {
+        if (!this.status.equals(DRAFT))
+            throw new DocumentStatusException("Document should be DRAFT to VERIFY");
         this.status = VERIFIED;
-        this.lastVerificatorId = verificatorId;
-        this.lastVerificationDate = now();
+        this.verifiedAt = LocalDateTime.now();
+        this.verifierId = employeeId;
     }
 
-    public void archive() {
+    public void archive(EmployeeId employeeId) {
         this.status = ARCHIVED;
     }
 
     public void publish(PublishDocumentCommand cmd, PrintCostCalculator printCostCalculator) {
-        if (status != VERIFIED)
-            throw new DocumentStatusException();
-
+        if(!this.status.equals(VERIFIED))
+            throw new DocumentStatusException("Document should be VERIFIED to PUBLISH");
         this.status = PUBLISHED;
-        this.publisherId = cmd.getPublisherId();
-        this.publicationDate = now();
+        this.publishedAt = LocalDateTime.now();
+        this.publisherId = cmd.getEmployeeId();
     }
 
     public void confirm(ConfirmDocumentCommand cmd) {
-        if (status == ARCHIVED)
-            throw new DocumentStatusException();
 
     }
 
     public void confirmFor(ConfirmForDocumentCommand cmd) {
-        if (status == ARCHIVED)
-            throw new DocumentStatusException();
+
     }
 
     public DocumentStatus getStatus() {
@@ -93,36 +85,35 @@ public class Document {
         return content;
     }
 
-    public LocalDateTime getCreationDate() {
-        return creationDate;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public LocalDateTime getLastVerificationDate() {
-        return lastVerificationDate;
+    public LocalDateTime getVerifiedAt() {
+        return verifiedAt;
     }
 
-    public LocalDateTime getPublicationDate() {
-        return publicationDate;
+    public LocalDateTime getPublishedAt() {
+        return publishedAt;
     }
 
-    public LocalDateTime getLastEditionDate() {
-        return lastEditionDate;
+    public LocalDateTime getChangedAt() {
+        return changedAt;
     }
 
     public EmployeeId getCreatorId() {
         return creatorId;
     }
 
-    public EmployeeId getLastVerificatorId() {
-        return lastVerificatorId;
+    public EmployeeId getVerifierId() {
+        return verifierId;
     }
 
-    public EmployeeId getLastEditorId() {
-        return lastEditorId;
+    public EmployeeId getEditorId() {
+        return editorId;
     }
 
     public EmployeeId getPublisherId() {
         return publisherId;
     }
-
 }

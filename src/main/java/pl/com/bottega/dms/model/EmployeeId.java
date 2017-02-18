@@ -2,9 +2,9 @@ package pl.com.bottega.dms.model;
 
 public class EmployeeId {
 
-    private long id;
+    private Long id;
 
-    public EmployeeId(long id) {
+    public EmployeeId(Long id) {
         this.id = id;
     }
 
@@ -15,12 +15,12 @@ public class EmployeeId {
 
         EmployeeId that = (EmployeeId) o;
 
-        return id == that.id;
+        return id.equals(that.id);
 
     }
 
     @Override
     public int hashCode() {
-        return (int) (id ^ (id >>> 32));
+        return id.hashCode();
     }
 }

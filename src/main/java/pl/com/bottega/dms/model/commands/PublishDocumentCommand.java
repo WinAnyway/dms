@@ -3,15 +3,13 @@ package pl.com.bottega.dms.model.commands;
 import pl.com.bottega.dms.model.EmployeeId;
 
 public class PublishDocumentCommand {
+    private EmployeeId employeeId;
 
-
-    private EmployeeId publisherId;
-
-    public EmployeeId getPublisherId() {
-        return publisherId;
+    public EmployeeId getEmployeeId() {
+        return employeeId;
     }
 
-    public void setPublisherId(EmployeeId publisherId) {
-        this.publisherId = publisherId;
+    public void setEmployeeId(EmployeeId employeeId) {
+        this.employeeId = employeeId;
     }
 }
