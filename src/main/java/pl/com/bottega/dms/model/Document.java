@@ -4,13 +4,20 @@ import pl.com.bottega.dms.model.commands.*;
 import pl.com.bottega.dms.model.numbers.NumberGenerator;
 import pl.com.bottega.dms.model.printing.PrintCostCalculator;
 
+import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import static pl.com.bottega.dms.model.DocumentStatus.*;
 
+@Entity
 public class Document {
 
+    @EmbeddedId
     private DocumentNumber number;
+    @Enumerated(EnumType.STRING)
     private DocumentStatus status;
     private String title;
     private String content;
@@ -18,10 +25,28 @@ public class Document {
     private LocalDateTime verifiedAt;
     private LocalDateTime publishedAt;
     private LocalDateTime changedAt;
+
+    @Embedded
+    @AttributeOverride(name = "id", column = @Column(name = "creatorId"))
     private EmployeeId creatorId;
+    @Embedded
+    @AttributeOverride(name = "id", column = @Column(name = "verifierId"))
     private EmployeeId verifierId;
+    @Embedded
+    @AttributeOverride(name = "id", column = @Column(name = "editorId"))
     private EmployeeId editorId;
+    @Embedded
+    @AttributeOverride(name = "id", column = @Column(name = "publisherId"))
     private EmployeeId publisherId;
+
+    private BigDecimal printCost;
+
+    @OneToMany
+    @JoinColumn(name = "documentNumber")
+    private Set<Confirmation> confirmations;
+
+    Document() {
+    }
 
     public Document(CreateDocumentCommand cmd, NumberGenerator numberGenerator) {
         this.number = numberGenerator.generate();
@@ -29,6 +54,7 @@ public class Document {
         this.title = cmd.getTitle();
         this.createdAt = LocalDateTime.now();
         this.creatorId = cmd.getEmployeeId();
+        this.confirmations = new HashSet<>();
     }
 
     public void change(ChangeDocumentCommand cmd) {
@@ -54,19 +80,49 @@ public class Document {
     }
 
     public void publish(PublishDocumentCommand cmd, PrintCostCalculator printCostCalculator) {
-        if(!this.status.equals(VERIFIED))
+        if (!this.status.equals(VERIFIED))
             throw new DocumentStatusException("Document should be VERIFIED to PUBLISH");
         this.status = PUBLISHED;
         this.publishedAt = LocalDateTime.now();
         this.publisherId = cmd.getEmployeeId();
+        this.printCost = printCostCalculator.calculateCost(this);
+        createConfirmations(cmd);
+    }
+
+    private void createConfirmations(PublishDocumentCommand cmd) {
+        for (EmployeeId employeeId : cmd.getRecipients())
+            confirmations.add(new Confirmation(employeeId));
     }
 
     public void confirm(ConfirmDocumentCommand cmd) {
+        EmployeeId employeeId = cmd.getEmployeeId();
 
+        if(isConfirmedBy(employeeId))
+            throw new DocumentStatusException(String.format("Document is already confirmed by employee with id: %d", employeeId.getId()));
+        for (Confirmation confirmation : confirmations)
+            if (confirmation.isOwnedBy(employeeId)) {
+                confirmation.confirm();
+                return;
+            }
+        throw new DocumentStatusException(String.format("Document not published for Employee with id: %d", employeeId.getId()));
     }
 
     public void confirmFor(ConfirmForDocumentCommand cmd) {
+        EmployeeId employeeId = cmd.getEmployeeId();
+        EmployeeId proxy = cmd.getConfirmingEmployeeId();
 
+        if(isConfirmedBy(employeeId))
+            throw new DocumentStatusException(String.format("Document is already confirmed by employee with id: %d", employeeId.getId()));
+
+        if(employeeId.equals(proxy))
+            throw new DocumentStatusException("Proxy and employee cannot be the same");
+
+        for (Confirmation confirmation : confirmations)
+            if (confirmation.isOwnedBy(employeeId)) {
+                confirmation.confirmFor(proxy);
+                return;
+            }
+        throw new DocumentStatusException(String.format("Document not published for Employee with id: %d", employeeId.getId()));
     }
 
     public DocumentStatus getStatus() {
@@ -115,5 +171,25 @@ public class Document {
 
     public EmployeeId getPublisherId() {
         return publisherId;
+    }
+
+    public BigDecimal getPrintCost() {
+        return printCost;
+    }
+
+    public boolean isConfirmedBy(EmployeeId employeeId) {
+        for (Confirmation confirmation : confirmations) {
+            if (confirmation.isOwnedBy(employeeId))
+                return confirmation.isConfirmed();
+        }
+        return false;
+    }
+
+    public Confirmation getConfirmation(EmployeeId employeeId) {
+        for (Confirmation confirmation : confirmations) {
+            if (confirmation.isOwnedBy(employeeId))
+                return confirmation;
+        }
+        return null;
     }
 }

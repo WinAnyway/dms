@@ -1,6 +1,8 @@
 package pl.com.bottega.dms.model;
 
-public class DocumentNumber {
+import java.io.Serializable;
+
+public class DocumentNumber implements Serializable{
 
 
     private String number;
@@ -23,5 +25,9 @@ public class DocumentNumber {
     @Override
     public int hashCode() {
         return number.hashCode();
+    }
+
+    public String getNumber() {
+        return number;
     }
 }
