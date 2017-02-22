@@ -41,7 +41,7 @@ public class Document {
 
     private BigDecimal printCost;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "documentNumber")
     private Set<Confirmation> confirmations;
 
@@ -191,5 +191,9 @@ public class Document {
                 return confirmation;
         }
         return null;
+    }
+
+    public Set<Confirmation> getConfirmations() {
+        return confirmations;
     }
 }

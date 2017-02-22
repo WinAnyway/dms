@@ -4,7 +4,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import pl.com.bottega.dms.application.DocumentCatalog;
 import pl.com.bottega.dms.application.DocumentFlowProcess;
+import pl.com.bottega.dms.application.ReadingConfirmator;
 import pl.com.bottega.dms.application.impl.StandardDocumentFlowProcess;
+import pl.com.bottega.dms.application.impl.StandardReadingConfirmator;
 import pl.com.bottega.dms.model.DocumentRepository;
 import pl.com.bottega.dms.model.numbers.ISONumberGenerator;
 import pl.com.bottega.dms.model.numbers.NumberGenerator;
@@ -39,4 +41,8 @@ public class Configurtion {
         return new JPADocumentRepository();
     }
 
+    @Bean
+    public ReadingConfirmator readingConfirmator(DocumentRepository documentRepository) {
+        return new StandardReadingConfirmator(documentRepository);
+    }
 }

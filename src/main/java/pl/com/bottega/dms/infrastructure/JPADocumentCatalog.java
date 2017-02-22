@@ -26,6 +26,8 @@ public class JPADocumentCatalog implements DocumentCatalog {
         DocumentDto documentDto = new DocumentDto();
         documentDto.setNumber(document.getNumber().getNumber());
         documentDto.setTitle(document.getTitle());
+        documentDto.setStatus(document.getStatus());
+        documentDto.setConfirmations(document.getConfirmations());
         return documentDto;
     }
 }

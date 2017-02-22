@@ -6,6 +6,7 @@ import pl.com.bottega.dms.application.DocumentFlowProcess;
 import pl.com.bottega.dms.model.Document;
 import pl.com.bottega.dms.model.DocumentNumber;
 import pl.com.bottega.dms.model.DocumentRepository;
+import pl.com.bottega.dms.model.EmployeeId;
 import pl.com.bottega.dms.model.commands.ChangeDocumentCommand;
 import pl.com.bottega.dms.model.commands.CreateDocumentCommand;
 import pl.com.bottega.dms.model.commands.PublishDocumentCommand;
@@ -35,22 +36,30 @@ public class StandardDocumentFlowProcess implements DocumentFlowProcess {
     }
 
     @Override
+    @Transactional
     public void change(ChangeDocumentCommand cmd) {
-
+        Document document = documentRepository.get(new DocumentNumber(cmd.getNumber()));
+        document.change(cmd);
     }
 
     @Override
-    public void verify(DocumentNumber documentNumber) {
-
+    @Transactional
+    public void verify(DocumentNumber documentNumber, EmployeeId employeeId) {
+        Document document = documentRepository.get(documentNumber);
+        document.verify(employeeId);
     }
 
     @Override
+    @Transactional
     public void publish(PublishDocumentCommand cmd) {
-
+        Document document = documentRepository.get(new DocumentNumber(cmd.getNumber()));
+        document.publish(cmd, printCostCalculator);
     }
 
     @Override
-    public void archive(DocumentNumber documentNumber) {
-
+    @Transactional
+    public void archive(DocumentNumber documentNumber, EmployeeId employeeId) {
+        Document document = documentRepository.get(documentNumber);
+        document.archive(employeeId);
     }
 }

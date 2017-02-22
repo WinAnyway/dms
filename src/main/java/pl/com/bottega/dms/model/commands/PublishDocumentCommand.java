@@ -7,6 +7,7 @@ import java.util.Collection;
 public class PublishDocumentCommand {
     private EmployeeId employeeId;
     private Collection<EmployeeId> recipients;
+    private String number;
 
     public EmployeeId getEmployeeId() {
         return employeeId;
@@ -22,5 +23,13 @@ public class PublishDocumentCommand {
 
     public void setRecipients(Collection<EmployeeId> recipients) {
         this.recipients = recipients;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
     }
 }

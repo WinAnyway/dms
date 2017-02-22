@@ -280,6 +280,84 @@ public class DocumentTest {
         assertTrue(document.isConfirmedBy(new EmployeeId(1L)));
     }
 
+    @Test
+    public void shouldRememberConfirmationDatesOfEmployees() {
+        Document document = given().publishedDocument();
+
+        ConfirmDocumentCommand confirmDocumentCommand = new ConfirmDocumentCommand();
+        ConfirmDocumentCommand confirmDocumentCommand2 = new ConfirmDocumentCommand();
+        EmployeeId employeeId = new EmployeeId(1L);
+        EmployeeId employeeId2 = new EmployeeId(2L);
+        confirmDocumentCommand.setEmployeeId(employeeId);
+        confirmDocumentCommand2.setEmployeeId(employeeId2);
+        document.confirm(confirmDocumentCommand);
+        document.confirm(confirmDocumentCommand2);
+
+        assertNotNull(document.getConfirmation(employeeId).getConfirmationDate());
+        assertNotNull(document.getConfirmation(employeeId2).getConfirmationDate());
+    }
+
+    @Test
+    public void shouldRememberWhoConfirmedForWhom() {
+        Document document = given().publishedDocument();
+
+        ConfirmForDocumentCommand confirmForDocumentCommand = new ConfirmForDocumentCommand();
+        EmployeeId employeeId = new EmployeeId(1L);
+        EmployeeId employeeId2 = new EmployeeId(2L);
+        confirmForDocumentCommand.setEmployeeId(employeeId);
+        confirmForDocumentCommand.setConfirmingEmployeeId(employeeId2);
+        document.confirmFor(confirmForDocumentCommand);
+
+        assertEquals(employeeId2, document.getConfirmation(employeeId).getProxy());
+    }
+
+    @Test
+    public void shouldNotAllowConfirmingTwiceByTheSameEmployee() {
+        try {
+            Document document = given().publishedDocument();
+
+            ConfirmDocumentCommand confirmDocumentCommand = new ConfirmDocumentCommand();
+            confirmDocumentCommand.setEmployeeId(new EmployeeId(1L));
+            document.confirm(confirmDocumentCommand);
+            document.confirm(confirmDocumentCommand);
+            fail("Should throw DocumentStatusException");
+        }
+        catch (DocumentStatusException e ) {
+            assertEquals("Document is already confirmed by employee with id: 1", e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldNotAllowConfirmingIfNotPublishedForTheEmployee() {
+        try {
+            Document document = given().publishedDocument();
+
+            ConfirmDocumentCommand confirmDocumentCommand = new ConfirmDocumentCommand();
+            confirmDocumentCommand.setEmployeeId(new EmployeeId(15L));
+            document.confirm(confirmDocumentCommand);
+            fail("Should throw DocumentStatusException");
+        }
+        catch (DocumentStatusException e) {
+            assertEquals("Document not published for Employee with id: 15", e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldNotAllowProxyAndEmployeeBeTheSame() {
+        try {
+            Document document = given().publishedDocument();
+
+            ConfirmForDocumentCommand confirmForDocumentCommand = new ConfirmForDocumentCommand();
+            confirmForDocumentCommand.setEmployeeId(new EmployeeId(1L));
+            confirmForDocumentCommand.setConfirmingEmployeeId(new EmployeeId(1L));
+            document.confirmFor(confirmForDocumentCommand);
+            fail("Should throw DocumentStatusException");
+        }
+        catch (DocumentStatusException e) {
+            assertEquals("Proxy and employee cannot be the same", e.getMessage());
+        }
+    }
+
     private static final Long DATE_EPS = 500L;
 
     private void assertSameTime(LocalDateTime expected, LocalDateTime actual) {
