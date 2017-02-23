@@ -20,7 +20,7 @@ public class Confirmation {
     @AttributeOverride(name = "id", column = @Column(name = "proxyId"))
     private EmployeeId proxy;
 
-    public Confirmation(){}
+    Confirmation(){}
 
     public Confirmation(EmployeeId owner) {
         this.owner = owner;
@@ -49,5 +49,9 @@ public class Confirmation {
 
     public EmployeeId getProxy() {
         return proxy;
+    }
+
+    public EmployeeId getOwner() {
+        return owner;
     }
 }

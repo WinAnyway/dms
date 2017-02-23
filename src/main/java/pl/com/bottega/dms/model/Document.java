@@ -1,5 +1,7 @@
 package pl.com.bottega.dms.model;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import pl.com.bottega.dms.model.commands.*;
 import pl.com.bottega.dms.model.numbers.NumberGenerator;
 import pl.com.bottega.dms.model.printing.PrintCostCalculator;
@@ -41,7 +43,8 @@ public class Document {
 
     private BigDecimal printCost;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
+    @Fetch(FetchMode.JOIN)
     @JoinColumn(name = "documentNumber")
     private Set<Confirmation> confirmations;
 

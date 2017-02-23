@@ -18,7 +18,6 @@ import pl.com.bottega.dms.model.commands.PublishDocumentCommand;
 import java.util.ArrayList;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static pl.com.bottega.dms.model.DocumentStatus.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(DmsApplication.class)
@@ -64,10 +63,10 @@ public class DocumentFlowTest {
         CreateDocumentCommand createDocumentCommand = new CreateDocumentCommand();
         DocumentNumber documentNumber = documentFlowProcess.create(createDocumentCommand);
         //when - I verify document
-        documentFlowProcess.verify(documentNumber, new EmployeeId(1L));
+        documentFlowProcess.verify(documentNumber);
         //then - Document is VERIFIED
         DocumentDto dto = documentCatalog.get(documentNumber);
-        assertThat(dto.getStatus()).isEqualTo(VERIFIED);
+        assertThat(dto.getStatus()).isEqualTo("VERIFIED");
     }
 
     @Test
@@ -76,7 +75,7 @@ public class DocumentFlowTest {
         EmployeeId employeeId = new EmployeeId(1L);
         CreateDocumentCommand createDocumentCommand = new CreateDocumentCommand();
         DocumentNumber documentNumber = documentFlowProcess.create(createDocumentCommand);
-        documentFlowProcess.verify(documentNumber, employeeId);
+        documentFlowProcess.verify(documentNumber);
         //when - I publish Document
         PublishDocumentCommand publishDocumentCommand = new PublishDocumentCommand();
         publishDocumentCommand.setNumber(documentNumber.getNumber());
@@ -84,7 +83,7 @@ public class DocumentFlowTest {
         documentFlowProcess.publish(publishDocumentCommand);
         //then - Document is PUBLISHED
         DocumentDto dto = documentCatalog.get(documentNumber);
-        assertThat(dto.getStatus()).isEqualTo(PUBLISHED);
+        assertThat(dto.getStatus()).isEqualTo("PUBLISHED");
     }
 
     @Test
@@ -93,10 +92,10 @@ public class DocumentFlowTest {
         CreateDocumentCommand createDocumentCommand = new CreateDocumentCommand();
         DocumentNumber documentNumber = documentFlowProcess.create(createDocumentCommand);
         //when - I archive Document
-        documentFlowProcess.archive(documentNumber, new EmployeeId(1L));
+        documentFlowProcess.archive(documentNumber);
         //then - Document is ARCHIVED
         DocumentDto dto = documentCatalog.get(documentNumber);
-        assertThat(dto.getStatus()).isEqualTo(ARCHIVED);
+        assertThat(dto.getStatus()).isEqualTo("ARCHIVED");
     }
 
 }

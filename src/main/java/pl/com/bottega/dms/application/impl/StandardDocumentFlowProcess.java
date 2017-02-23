@@ -44,7 +44,8 @@ public class StandardDocumentFlowProcess implements DocumentFlowProcess {
 
     @Override
     @Transactional
-    public void verify(DocumentNumber documentNumber, EmployeeId employeeId) {
+    public void verify(DocumentNumber documentNumber) {
+        EmployeeId employeeId = new EmployeeId(1L);
         Document document = documentRepository.get(documentNumber);
         document.verify(employeeId);
     }
@@ -58,7 +59,8 @@ public class StandardDocumentFlowProcess implements DocumentFlowProcess {
 
     @Override
     @Transactional
-    public void archive(DocumentNumber documentNumber, EmployeeId employeeId) {
+    public void archive(DocumentNumber documentNumber) {
+        EmployeeId employeeId = new EmployeeId(1L);
         Document document = documentRepository.get(documentNumber);
         document.archive(employeeId);
     }

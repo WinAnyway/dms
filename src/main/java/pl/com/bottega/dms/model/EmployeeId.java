@@ -7,7 +7,7 @@ public class EmployeeId {
 
     private Long id;
 
-    public EmployeeId(){}
+    EmployeeId(){}
 
     public EmployeeId(Long id) {
         this.id = id;
