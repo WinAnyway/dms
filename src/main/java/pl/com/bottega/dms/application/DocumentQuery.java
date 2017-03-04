@@ -12,8 +12,8 @@ public class DocumentQuery {
 
     private Long creatorId;
 
-    private Long prageNumber;
-    private Long perPage;
+    private Integer pageNumber = 1;
+    private Integer perPage = 50;
 
     private String sortBy;
     private String sortOrder;
@@ -58,19 +58,19 @@ public class DocumentQuery {
         this.creatorId = creatorId;
     }
 
-    public Long getPrageNumber() {
-        return prageNumber;
+    public Integer getPageNumber() {
+        return pageNumber;
     }
 
-    public void setPrageNumber(Long prageNumber) {
-        this.prageNumber = prageNumber;
+    public void setPageNumber(Integer pageNumber) {
+        this.pageNumber = pageNumber;
     }
 
-    public Long getPerPage() {
+    public Integer getPerPage() {
         return perPage;
     }
 
-    public void setPerPage(Long perPage) {
+    public void setPerPage(Integer perPage) {
         this.perPage = perPage;
     }
 

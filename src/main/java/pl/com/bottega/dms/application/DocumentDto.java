@@ -10,6 +10,7 @@ public class DocumentDto {
 
     private String status;
     private List<ConfirmationDto> confirmations;
+    private Long creatorId;
 
     public String getTitle() {
         return title;
@@ -49,5 +50,13 @@ public class DocumentDto {
 
     public void setConfirmations(List<ConfirmationDto> confirmations) {
         this.confirmations = confirmations;
+    }
+
+    public Long getCreatorId() {
+        return creatorId;
+    }
+
+    public void setCreatorId(Long creatorId) {
+        this.creatorId = creatorId;
     }
 }
