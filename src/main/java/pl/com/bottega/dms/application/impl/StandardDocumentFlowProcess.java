@@ -1,5 +1,8 @@
 package pl.com.bottega.dms.application.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import pl.com.bottega.dms.application.DocumentFlowProcess;
 import pl.com.bottega.dms.model.Document;
@@ -13,18 +16,25 @@ import pl.com.bottega.dms.model.numbers.NumberGenerator;
 import pl.com.bottega.dms.model.printing.PrintCostCalculator;
 
 @Transactional
+@Component
 public class StandardDocumentFlowProcess implements DocumentFlowProcess {
 
+    @Autowired
     private NumberGenerator numberGenerator;
+
+    @Autowired
+    @Qualifier("bw")
     private PrintCostCalculator printCostCalculator;
+
+    @Autowired
     private DocumentRepository documentRepository;
 
-    public StandardDocumentFlowProcess(NumberGenerator numberGenerator, PrintCostCalculator printCostCalculator,
+    /*public StandardDocumentFlowProcess(NumberGenerator numberGenerator, @Qualifier("bw") PrintCostCalculator printCostCalculator,
                                        DocumentRepository documentRepository) {
         this.numberGenerator = numberGenerator;
         this.printCostCalculator = printCostCalculator;
         this.documentRepository = documentRepository;
-    }
+    }*/
 
     @Override
     public DocumentNumber create(CreateDocumentCommand cmd) {
