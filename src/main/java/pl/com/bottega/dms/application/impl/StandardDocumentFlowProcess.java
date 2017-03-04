@@ -1,6 +1,5 @@
 package pl.com.bottega.dms.application.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import pl.com.bottega.dms.application.DocumentFlowProcess;
 import pl.com.bottega.dms.model.Document;
@@ -13,22 +12,21 @@ import pl.com.bottega.dms.model.commands.PublishDocumentCommand;
 import pl.com.bottega.dms.model.numbers.NumberGenerator;
 import pl.com.bottega.dms.model.printing.PrintCostCalculator;
 
+@Transactional
 public class StandardDocumentFlowProcess implements DocumentFlowProcess {
 
     private NumberGenerator numberGenerator;
     private PrintCostCalculator printCostCalculator;
     private DocumentRepository documentRepository;
 
-    @Autowired
-    public StandardDocumentFlowProcess(NumberGenerator numberGenerator, PrintCostCalculator printCostCalculator, DocumentRepository documentRepository) {
-
+    public StandardDocumentFlowProcess(NumberGenerator numberGenerator, PrintCostCalculator printCostCalculator,
+                                       DocumentRepository documentRepository) {
         this.numberGenerator = numberGenerator;
         this.printCostCalculator = printCostCalculator;
         this.documentRepository = documentRepository;
     }
 
     @Override
-    @Transactional
     public DocumentNumber create(CreateDocumentCommand cmd) {
         Document document = new Document(cmd, numberGenerator);
         documentRepository.put(document);
@@ -36,32 +34,28 @@ public class StandardDocumentFlowProcess implements DocumentFlowProcess {
     }
 
     @Override
-    @Transactional
     public void change(ChangeDocumentCommand cmd) {
-        Document document = documentRepository.get(new DocumentNumber(cmd.getNumber()));
+        DocumentNumber documentNumber = new DocumentNumber(cmd.getNumber());
+        Document document = documentRepository.get(documentNumber);
         document.change(cmd);
     }
 
     @Override
-    @Transactional
     public void verify(DocumentNumber documentNumber) {
-        EmployeeId employeeId = new EmployeeId(1L);
         Document document = documentRepository.get(documentNumber);
-        document.verify(employeeId);
+        document.verify(new EmployeeId(1L));
     }
 
     @Override
-    @Transactional
     public void publish(PublishDocumentCommand cmd) {
-        Document document = documentRepository.get(new DocumentNumber(cmd.getNumber()));
+        DocumentNumber documentNumber = new DocumentNumber(cmd.getNumber());
+        Document document = documentRepository.get(documentNumber);
         document.publish(cmd, printCostCalculator);
     }
 
     @Override
-    @Transactional
     public void archive(DocumentNumber documentNumber) {
-        EmployeeId employeeId = new EmployeeId(1L);
         Document document = documentRepository.get(documentNumber);
-        document.archive(employeeId);
+        document.archive(new EmployeeId(1L));
     }
 }

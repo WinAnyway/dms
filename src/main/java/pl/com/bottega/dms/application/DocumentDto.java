@@ -1,14 +1,15 @@
 package pl.com.bottega.dms.application;
 
-import java.util.Set;
+import java.util.List;
 
 public class DocumentDto {
-
-
     private String title;
     private String number;
+
+    private String content;
+
     private String status;
-    private Set<ConfirmationDto> confirmations;
+    private List<ConfirmationDto> confirmations;
 
     public String getTitle() {
         return title;
@@ -26,6 +27,14 @@ public class DocumentDto {
         this.number = number;
     }
 
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -34,19 +43,11 @@ public class DocumentDto {
         this.status = status;
     }
 
-    public Set<ConfirmationDto> getConfirmations() {
+    public List<ConfirmationDto> getConfirmations() {
         return confirmations;
     }
 
-    public void setConfirmations(Set<ConfirmationDto> confirmations) {
+    public void setConfirmations(List<ConfirmationDto> confirmations) {
         this.confirmations = confirmations;
-    }
-
-    public ConfirmationDto getConfirmation(Long employeeId) {
-        for (ConfirmationDto confirmationDto : confirmations)
-            if (confirmationDto.getOwner().equals(employeeId))
-                return confirmationDto;
-
-        return null;
     }
 }

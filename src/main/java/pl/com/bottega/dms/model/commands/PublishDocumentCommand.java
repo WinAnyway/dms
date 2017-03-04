@@ -3,6 +3,7 @@ package pl.com.bottega.dms.model.commands;
 import pl.com.bottega.dms.model.EmployeeId;
 
 import java.util.Collection;
+import java.util.List;
 
 public class PublishDocumentCommand {
     private EmployeeId employeeId;
@@ -17,12 +18,12 @@ public class PublishDocumentCommand {
         this.employeeId = employeeId;
     }
 
-    public Collection<EmployeeId> getRecipients() {
-        return recipients;
-    }
-
     public void setRecipients(Collection<EmployeeId> recipients) {
         this.recipients = recipients;
+    }
+
+    public Collection<EmployeeId> getRecipients() {
+        return recipients;
     }
 
     public String getNumber() {

@@ -7,11 +7,11 @@ public class EmployeeId {
 
     private Long id;
 
-    EmployeeId(){}
-
     public EmployeeId(Long id) {
         this.id = id;
     }
+
+    EmployeeId() {}
 
     @Override
     public boolean equals(Object o) {
@@ -21,7 +21,6 @@ public class EmployeeId {
         EmployeeId that = (EmployeeId) o;
 
         return id.equals(that.id);
-
     }
 
     @Override

@@ -4,17 +4,17 @@ import pl.com.bottega.dms.application.*;
 import pl.com.bottega.dms.model.Confirmation;
 import pl.com.bottega.dms.model.Document;
 import pl.com.bottega.dms.model.DocumentNumber;
-import pl.com.bottega.dms.model.EmployeeId;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.HashSet;
-import java.util.Set;
+import javax.persistence.Query;
+import java.util.LinkedList;
+import java.util.List;
 
 public class JPADocumentCatalog implements DocumentCatalog {
 
     @PersistenceContext
-    EntityManager entityManager;
+    private EntityManager entityManager;
 
     @Override
     public DocumentSearchResults find(DocumentQuery documentQuery) {
@@ -23,26 +23,30 @@ public class JPADocumentCatalog implements DocumentCatalog {
 
     @Override
     public DocumentDto get(DocumentNumber documentNumber) {
-        Document document = entityManager.find(Document.class, documentNumber);
+        Query query = entityManager.createQuery("FROM Document d LEFT JOIN FETCH d.confirmations WHERE d.number = :nr");
+        query.setParameter("nr", documentNumber);
+        Document document = (Document) query.getResultList().get(0);
         DocumentDto documentDto = new DocumentDto();
-        documentDto.setNumber(document.getNumber().getNumber());
+        documentDto.setNumber(documentNumber.getNumber());
         documentDto.setTitle(document.getTitle());
-        documentDto.setStatus(document.getStatus().toString());
-        documentDto.setConfirmations(changeConfirmationsToDtos(document.getConfirmations()));
+        documentDto.setContent(document.getContent());
+        documentDto.setStatus(document.getStatus().name());
+        List<ConfirmationDto> confirmationDtos = new LinkedList<>();
+        for(Confirmation confirmation : document.getConfirmations()) {
+            ConfirmationDto dto = createConfirmationDto(confirmation);
+            confirmationDtos.add(dto);
+        }
+        documentDto.setConfirmations(confirmationDtos);
         return documentDto;
     }
 
-    private Set<ConfirmationDto> changeConfirmationsToDtos(Set<Confirmation> confirmations) {
-        Set<ConfirmationDto> dtos = new HashSet<>();
-        for (Confirmation confirmation : confirmations) {
-            ConfirmationDto dto = new ConfirmationDto();
-            dto.setOwner(confirmation.getOwner().getId());
-            EmployeeId proxy = confirmation.getProxy();
-            if (proxy != null)
-                dto.setProxy(proxy.getId());
-            dto.setConfirmationDate(confirmation.getConfirmationDate());
-            dtos.add(dto);
-        }
-        return dtos;
+    private ConfirmationDto createConfirmationDto(Confirmation confirmation) {
+        ConfirmationDto dto = new ConfirmationDto();
+        dto.setConfirmed(confirmation.isConfirmed());
+        dto.setConfirmedAt(confirmation.getConfirmationDate());
+        dto.setOwnerEmployeeId(confirmation.getOwner().getId());
+        if(confirmation.hasProxy())
+            dto.setProxyEmployeeId(confirmation.getProxy().getId());
+        return dto;
     }
 }

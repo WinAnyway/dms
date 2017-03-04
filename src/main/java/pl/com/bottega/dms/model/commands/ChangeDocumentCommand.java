@@ -1,12 +1,13 @@
 package pl.com.bottega.dms.model.commands;
 
+import pl.com.bottega.dms.model.DocumentNumber;
 import pl.com.bottega.dms.model.EmployeeId;
 
 public class ChangeDocumentCommand {
     private String title;
     private String content;
-    private String number;
     private EmployeeId employeeId;
+    private String number;
 
     public void setTitle(String title) {
         this.title = title;

@@ -1,7 +1,6 @@
 package pl.com.bottega.dms.infrastructure;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import pl.com.bottega.dms.application.DocumentCatalog;
 import pl.com.bottega.dms.application.DocumentFlowProcess;
 import pl.com.bottega.dms.application.ReadingConfirmator;
@@ -13,11 +12,14 @@ import pl.com.bottega.dms.model.numbers.NumberGenerator;
 import pl.com.bottega.dms.model.printing.PrintCostCalculator;
 import pl.com.bottega.dms.model.printing.RGBPrintCostCalculator;
 
-@Configuration
-public class Configurtion {
+@org.springframework.context.annotation.Configuration
+public class Configuration {
 
     @Bean
-    public DocumentFlowProcess documentFlowProcess(NumberGenerator numberGenerator, PrintCostCalculator printCostCalculator, DocumentRepository documentRepository) {
+    public DocumentFlowProcess documentFlowProcess(NumberGenerator numberGenerator,
+                                                   PrintCostCalculator printCostCalculator,
+                                                   DocumentRepository documentRepository
+    ) {
         return new StandardDocumentFlowProcess(numberGenerator, printCostCalculator, documentRepository);
     }
 
@@ -42,7 +44,8 @@ public class Configurtion {
     }
 
     @Bean
-    public ReadingConfirmator readingConfirmator(DocumentRepository documentRepository) {
-        return new StandardReadingConfirmator(documentRepository);
+    public ReadingConfirmator readingConfirmator(DocumentRepository repo) {
+        return new StandardReadingConfirmator(repo);
     }
+
 }

@@ -8,25 +8,26 @@ import pl.com.bottega.dms.model.DocumentRepository;
 import pl.com.bottega.dms.model.commands.ConfirmDocumentCommand;
 import pl.com.bottega.dms.model.commands.ConfirmForDocumentCommand;
 
-public class StandardReadingConfirmator implements ReadingConfirmator{
+@Transactional
+public class StandardReadingConfirmator implements ReadingConfirmator {
 
-    private final DocumentRepository documentRepository;
+    private DocumentRepository documentRepository;
 
     public StandardReadingConfirmator(DocumentRepository documentRepository) {
         this.documentRepository = documentRepository;
     }
 
     @Override
-    @Transactional
     public void confirm(ConfirmDocumentCommand cmd) {
-        Document document = documentRepository.get(new DocumentNumber(cmd.getNumber()));
+        DocumentNumber documentNumber = new DocumentNumber(cmd.getNumber());
+        Document document = documentRepository.get(documentNumber);
         document.confirm(cmd);
     }
 
     @Override
-    @Transactional
     public void confirmFor(ConfirmForDocumentCommand cmd) {
-        Document document = documentRepository.get(new DocumentNumber(cmd.getNumber()));
+        DocumentNumber documentNumber = new DocumentNumber(cmd.getNumber());
+        Document document = documentRepository.get(documentNumber);
         document.confirmFor(cmd);
     }
 }
