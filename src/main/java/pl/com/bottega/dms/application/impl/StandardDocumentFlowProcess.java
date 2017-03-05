@@ -48,7 +48,7 @@ public class StandardDocumentFlowProcess implements DocumentFlowProcess {
 
     @Override
     public void publish(PublishDocumentCommand cmd) {
-        DocumentNumber documentNumber = new DocumentNumber(cmd.getNumber());
+        DocumentNumber documentNumber = new DocumentNumber(cmd.getDocumentNumber());
         Document document = documentRepository.get(documentNumber);
         document.publish(cmd, printCostCalculator);
     }

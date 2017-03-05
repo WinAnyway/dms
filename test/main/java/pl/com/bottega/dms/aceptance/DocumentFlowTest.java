@@ -91,7 +91,7 @@ public class DocumentFlowTest {
 
         //when
         PublishDocumentCommand cmd = new PublishDocumentCommand();
-        cmd.setNumber(documentNumber.getNumber());
+        cmd.setDocumentNumber(documentNumber.getNumber());
         cmd.setRecipients(Arrays.asList(new EmployeeId(1L)));
         documentFlowProcess.publish(cmd);
 

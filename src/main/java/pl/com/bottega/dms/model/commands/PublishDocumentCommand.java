@@ -3,12 +3,11 @@ package pl.com.bottega.dms.model.commands;
 import pl.com.bottega.dms.model.EmployeeId;
 
 import java.util.Collection;
-import java.util.List;
 
 public class PublishDocumentCommand {
     private EmployeeId employeeId;
     private Collection<EmployeeId> recipients;
-    private String number;
+    private String documentNumber;
 
     public EmployeeId getEmployeeId() {
         return employeeId;
@@ -26,11 +25,12 @@ public class PublishDocumentCommand {
         return recipients;
     }
 
-    public String getNumber() {
-        return number;
+    public String getDocumentNumber() {
+        return documentNumber;
     }
 
-    public void setNumber(String number) {
-        this.number = number;
+    public void setDocumentNumber(String documentNumber) {
+        this.documentNumber = documentNumber;
     }
+
 }

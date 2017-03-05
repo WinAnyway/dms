@@ -1,5 +1,6 @@
 package pl.com.bottega.dms.application;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class DocumentDto {
@@ -11,6 +12,7 @@ public class DocumentDto {
     private String status;
     private List<ConfirmationDto> confirmations;
     private Long creatorId;
+    private LocalDateTime createdAt;
 
     public String getTitle() {
         return title;
@@ -58,5 +60,13 @@ public class DocumentDto {
 
     public void setCreatorId(Long creatorId) {
         this.creatorId = creatorId;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 }
