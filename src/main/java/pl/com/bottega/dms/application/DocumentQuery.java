@@ -9,14 +9,23 @@ public class DocumentQuery {
 
     private LocalDateTime createdAfter;
     private LocalDateTime createdBefore;
+    private LocalDateTime changedAfter;
+    private LocalDateTime changedBefore;
+    private LocalDateTime verifiedAfter;
+    private LocalDateTime verifiedBefore;
+    private LocalDateTime publishedAfter;
+    private LocalDateTime publishedBefore;
 
     private Long creatorId;
-
     private Integer pageNumber = 1;
-    private Integer perPage = 50;
 
+    private Integer perPage = 50;
     private String sortBy;
+
     private String sortOrder;
+    private Long editorId;
+    private Long verifierId;
+    private Long publisherId;
 
     public String getPhrase() {
         return phrase;
@@ -88,5 +97,77 @@ public class DocumentQuery {
 
     public void setSortOrder(String sortOrder) {
         this.sortOrder = sortOrder;
+    }
+
+    public LocalDateTime getChangedAfter() {
+        return changedAfter;
+    }
+
+    public void setChangedAfter(LocalDateTime changedAfter) {
+        this.changedAfter = changedAfter;
+    }
+
+    public LocalDateTime getChangedBefore() {
+        return changedBefore;
+    }
+
+    public void setChangedBefore(LocalDateTime changedBefore) {
+        this.changedBefore = changedBefore;
+    }
+
+    public LocalDateTime getVerifiedAfter() {
+        return verifiedAfter;
+    }
+
+    public void setVerifiedAfter(LocalDateTime verifiedAfter) {
+        this.verifiedAfter = verifiedAfter;
+    }
+
+    public LocalDateTime getVerifiedBefore() {
+        return verifiedBefore;
+    }
+
+    public void setVerifiedBefore(LocalDateTime verifiedBefore) {
+        this.verifiedBefore = verifiedBefore;
+    }
+
+    public LocalDateTime getPublishedAfter() {
+        return publishedAfter;
+    }
+
+    public void setPublishedAfter(LocalDateTime publishedAfter) {
+        this.publishedAfter = publishedAfter;
+    }
+
+    public LocalDateTime getPublishedBefore() {
+        return publishedBefore;
+    }
+
+    public void setPublishedBefore(LocalDateTime publishedBefore) {
+        this.publishedBefore = publishedBefore;
+    }
+
+    public Long getEditorId() {
+        return editorId;
+    }
+
+    public void setEditorId(Long editorId) {
+        this.editorId = editorId;
+    }
+
+    public Long getVerifierId() {
+        return verifierId;
+    }
+
+    public void setVerifierId(Long verifierId) {
+        this.verifierId = verifierId;
+    }
+
+    public Long getPublisherId() {
+        return publisherId;
+    }
+
+    public void setPublisherId(Long publisherId) {
+        this.publisherId = publisherId;
     }
 }

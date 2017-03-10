@@ -16,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-//@Component
+@Component
 public class JPQLDocumentCatalog implements DocumentCatalog{
 
     @PersistenceContext
@@ -35,15 +35,29 @@ public class JPQLDocumentCatalog implements DocumentCatalog{
         }
         Query query = entityManager.createQuery(jpqlQuery);
         applyPredicateParameters(query, documentQuery);
-        query.setFirstResult(0);
+        query.setFirstResult(getFirstResultOffset(documentQuery));
         query.setMaxResults(documentQuery.getPerPage());
+
         List<Document> documents = query.getResultList();
         List<DocumentDto> dtos = getDocumentDtos(documents);
+
+        String countJpqlQuery = "SELECT COUNT(d) FROM Document d";
+        Query countQuery = entityManager.createQuery(countJpqlQuery);
+        Long total = (Long)countQuery.getSingleResult();
+
         results.setDocuments(dtos);
+        results.setPagesCount(total / documentQuery.getPerPage() + (total % documentQuery.getPerPage() == 0 ? 0 : 1));
+        results.setPerPage(documentQuery.getPerPage());
+        results.setPageNumber(documentQuery.getPageNumber());
         return results;
     }
 
+    private int getFirstResultOffset(DocumentQuery documentQuery) {
+        return (documentQuery.getPageNumber() - 1) * documentQuery.getPerPage();
+    }
+
     private void applyPredicateParameters(Query query, DocumentQuery documentQuery) {
+        query.setParameter("archived", DocumentStatus.valueOf("ARCHIVED"));
         if(documentQuery.getStatus() != null)
             query.setParameter("status", DocumentStatus.valueOf(documentQuery.getStatus()));
         if(documentQuery.getCreatorId() != null)
@@ -56,10 +70,29 @@ public class JPQLDocumentCatalog implements DocumentCatalog{
             query.setParameter("createdBefore", documentQuery.getCreatedBefore());
         if(documentQuery.getCreatedAfter() != null)
             query.setParameter("createdAfter", documentQuery.getCreatedAfter());
+        if(documentQuery.getChangedBefore() != null)
+            query.setParameter("changedBefore", documentQuery.getChangedBefore());
+        if(documentQuery.getChangedAfter() != null)
+            query.setParameter("changedAfter", documentQuery.getChangedAfter());
+        if(documentQuery.getVerifiedBefore() != null)
+            query.setParameter("verifiedBefore", documentQuery.getVerifiedBefore());
+        if(documentQuery.getVerifiedAfter() != null)
+            query.setParameter("verifiedAfter", documentQuery.getVerifiedAfter());
+        if(documentQuery.getPublishedBefore() != null)
+            query.setParameter("publishedBefore", documentQuery.getPublishedBefore());
+        if(documentQuery.getPublishedAfter() != null)
+            query.setParameter("publishedAfter", documentQuery.getPublishedAfter());
+        if(documentQuery.getEditorId() != null)
+            query.setParameter("editorId", documentQuery.getEditorId());
+        if(documentQuery.getVerifierId() != null)
+            query.setParameter("verifierId", documentQuery.getVerifierId());
+        if(documentQuery.getPublisherId() != null)
+            query.setParameter("publisherId", documentQuery.getPublisherId());
     }
 
     private Set<String> createPredicates(DocumentQuery documentQuery) {
         Set<String> predicates = new HashSet<>();
+        predicates.add("d.status != :archived");
         if(documentQuery.getStatus() != null)
             predicates.add("d.status = :status");
         if(documentQuery.getCreatorId() != null)
@@ -70,7 +103,24 @@ public class JPQLDocumentCatalog implements DocumentCatalog{
             predicates.add("d.createdAt < :createdBefore");
         if(documentQuery.getCreatedAfter() != null)
             predicates.add("d.createdAt > :createdAfter");
-
+        if(documentQuery.getChangedBefore() != null)
+            predicates.add("d.changedAt < :changedBefore");
+        if(documentQuery.getChangedAfter() != null)
+            predicates.add("d.changedAt > :changedAfter");
+        if(documentQuery.getVerifiedBefore() != null)
+            predicates.add("d.verifiedAt < :verifiedBefore");
+        if(documentQuery.getVerifiedAfter() != null)
+            predicates.add("d.verifiedAt > :verifiedAfter");
+        if(documentQuery.getPublishedBefore() != null)
+            predicates.add("d.publishedAt < :publishedBefore");
+        if(documentQuery.getPublishedAfter() != null)
+            predicates.add("d.publishedAt > :publishedAfter");
+        if(documentQuery.getEditorId() != null)
+            predicates.add("d.editorId.id = :editorId");
+        if(documentQuery.getVerifierId() != null)
+            predicates.add("d.verifierId.id = :verifierId");
+        if(documentQuery.getPublisherId() != null)
+            predicates.add("d.publisherId.id = :publisherId");
         return predicates;
     }
 

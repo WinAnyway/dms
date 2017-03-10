@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class JPADocumentCatalogTest {
 
     @Autowired
-    //private JPADocumentCatalog catalog;
+//    private JPADocumentCatalog catalog;
     private JPQLDocumentCatalog catalog;
 
     @Test
@@ -32,7 +32,7 @@ public class JPADocumentCatalogTest {
         documentQuery.setPhrase("fancy");
         DocumentSearchResults searchResults = catalog.find(documentQuery);
         //then
-        assertThat(searchResults.getDocuments().size()).isEqualTo(3);
+        assertThat(searchResults.getDocuments().size()).isEqualTo(2);
     }
 
     @Test
@@ -47,7 +47,6 @@ public class JPADocumentCatalogTest {
         //then
         assertThat(searchResults.getDocuments().size()).isEqualTo(2);
         assertThat(searchResults.getDocuments().get(0).getNumber()).isEqualTo("1");
-        assertThat(searchResults.getDocuments().get(1).getNumber()).isEqualTo("fancy");
     }
 
     @Test
@@ -59,7 +58,7 @@ public class JPADocumentCatalogTest {
         documentQuery.setCreatorId(2L);
         DocumentSearchResults searchResults = catalog.find(documentQuery);
         //then
-        assertThat(searchResults.getDocuments().size()).isEqualTo(3);
+        assertThat(searchResults.getDocuments().size()).isEqualTo(2);
         assertThat(searchResults.getDocuments().get(0).getCreatorId()).isEqualTo(2L);
         assertThat(searchResults.getDocuments().get(1).getCreatorId()).isEqualTo(2L);
     }
@@ -74,9 +73,9 @@ public class JPADocumentCatalogTest {
         documentQuery.setPhrase("fancy");
         DocumentSearchResults searchResults = catalog.find(documentQuery);
         //then
-        assertThat(searchResults.getDocuments().size()).isEqualTo(2);
+        assertThat(searchResults.getDocuments().size()).isEqualTo(1);
         assertThat(searchResults.getDocuments().get(0).getCreatorId()).isEqualTo(2L);
-        assertThat(searchResults.getDocuments().get(0).getNumber()).isEqualTo("2");
+        assertThat(searchResults.getDocuments().get(0).getNumber()).isEqualTo("fancy");
     }
 
     @Test
@@ -85,15 +84,15 @@ public class JPADocumentCatalogTest {
     public void shouldFindDocumentByPhraseAndStatusAndCreatorId() {
         //when
         DocumentQuery documentQuery = new DocumentQuery();
-        documentQuery.setCreatorId(2L);
+        documentQuery.setCreatorId(1L);
         documentQuery.setPhrase("fancy");
-        documentQuery.setStatus("ARCHIVED");
+        documentQuery.setStatus("DRAFT");
         DocumentSearchResults searchResults = catalog.find(documentQuery);
         //then
         assertThat(searchResults.getDocuments().size()).isEqualTo(1);
-        assertThat(searchResults.getDocuments().get(0).getCreatorId()).isEqualTo(2L);
-        assertThat(searchResults.getDocuments().get(0).getNumber()).isEqualTo("2");
-        assertThat(searchResults.getDocuments().get(0).getStatus()).isEqualTo("ARCHIVED");
+        assertThat(searchResults.getDocuments().get(0).getCreatorId()).isEqualTo(1L);
+        assertThat(searchResults.getDocuments().get(0).getNumber()).isEqualTo("1");
+        assertThat(searchResults.getDocuments().get(0).getStatus()).isEqualTo("DRAFT");
     }
 
     @Test
@@ -106,9 +105,9 @@ public class JPADocumentCatalogTest {
         documentQuery.setCreatedBefore(LocalDateTime.of(2017, 1, 1, 11, 0));
         DocumentSearchResults searchResults = catalog.find(documentQuery);
         //then
-        assertThat(searchResults.getDocuments().size()).isEqualTo(2);
+        assertThat(searchResults.getDocuments().size()).isEqualTo(1);
         assertThat(searchResults.getDocuments().get(0).getNumber()).isEqualTo("1");
-        assertThat(searchResults.getDocuments().get(1).getNumber()).isEqualTo("2");
+//        assertThat(searchResults.getDocuments().get(1).getNumber()).isEqualTo("2");
     }
 
     @Test
@@ -121,12 +120,102 @@ public class JPADocumentCatalogTest {
         documentQuery.setPerPage(2);
         DocumentSearchResults searchResults = catalog.find(documentQuery);
         //then
-        assertThat(searchResults.getDocuments().size()).isEqualTo(2);
-        assertThat(searchResults.getDocuments().get(0).getNumber()).isEqualTo("4");
-        assertThat(searchResults.getDocuments().get(1).getNumber()).isEqualTo("fancy");
+        assertThat(searchResults.getDocuments().size()).isEqualTo(1);
+        assertThat(searchResults.getDocuments().get(0).getNumber()).isEqualTo("fancy");
+//        assertThat(searchResults.getDocuments().get(1).getNumber()).isEqualTo("4");
         assertThat(searchResults.getPagesCount()).isEqualTo(2);
         assertThat(searchResults.getPageNumber()).isEqualTo(2);
         assertThat(searchResults.getPerPage()).isEqualTo(2);
+    }
+
+    @Test
+    @Sql("/fixtures/documentByPhrase.sql")
+    @Transactional
+    public void shouldNotReturnArchivedDocuments() {
+        //when
+        DocumentQuery documentQuery = new DocumentQuery();
+        DocumentSearchResults results = catalog.find(documentQuery);
+        //then
+        assertThat(results.getDocuments().size()).isEqualTo(3);
+    }
+
+    @Test
+    @Sql("/fixtures/documentByPhrase.sql")
+    @Transactional
+    public void shouldFindDocumentByChangeDate() {
+        DocumentQuery documentQuery = new DocumentQuery();
+        documentQuery.setChangedAfter(LocalDateTime.of(2017, 1, 2, 10, 0));
+        documentQuery.setChangedBefore(LocalDateTime.of(2017, 1, 2, 11, 0));
+        DocumentSearchResults searchResults = catalog.find(documentQuery);
+        //then
+        assertThat(searchResults.getDocuments().size()).isEqualTo(1);
+        assertThat(searchResults.getDocuments().get(0).getNumber()).isEqualTo("1");
+    }
+
+    @Test
+    @Sql("/fixtures/documentByPhrase.sql")
+    @Transactional
+    public void shouldFindDocumentByVerificationDate() {
+        DocumentQuery documentQuery = new DocumentQuery();
+        documentQuery.setVerifiedAfter(LocalDateTime.of(2017, 1, 3, 10, 0));
+        documentQuery.setVerifiedBefore(LocalDateTime.of(2017, 1, 4, 11, 0));
+        DocumentSearchResults searchResults = catalog.find(documentQuery);
+        //then
+        assertThat(searchResults.getDocuments().size()).isEqualTo(2);
+        assertThat(searchResults.getDocuments().get(0).getNumber()).isEqualTo("1");
+        assertThat(searchResults.getDocuments().get(1).getNumber()).isEqualTo("fancy");
+    }
+
+    @Test
+    @Sql("/fixtures/documentByPhrase.sql")
+    @Transactional
+    public void shouldFindDocumentByPublicationDate() {
+        DocumentQuery documentQuery = new DocumentQuery();
+        documentQuery.setPublishedAfter(LocalDateTime.of(2017, 1, 5, 10, 0));
+        documentQuery.setPublishedBefore(LocalDateTime.of(2017, 1, 8, 11, 0));
+        DocumentSearchResults searchResults = catalog.find(documentQuery);
+        //then
+        assertThat(searchResults.getDocuments().size()).isEqualTo(2);
+        assertThat(searchResults.getDocuments().get(0).getNumber()).isEqualTo("4");
+        assertThat(searchResults.getDocuments().get(1).getNumber()).isEqualTo("fancy");
+    }
+
+    @Test
+    @Sql("/fixtures/documentByPhrase.sql")
+    @Transactional
+    public void shouldFindDocumentByEditorId() {
+        DocumentQuery documentQuery = new DocumentQuery();
+        documentQuery.setEditorId(1L);
+        DocumentSearchResults searchResults = catalog.find(documentQuery);
+
+        assertThat(searchResults.getDocuments().size()).isEqualTo(1);
+        assertThat(searchResults.getDocuments().get(0).getNumber()).isEqualTo("1");
+    }
+
+    @Test
+    @Sql("/fixtures/documentByPhrase.sql")
+    @Transactional
+    public void shouldFindDocumentByVerifierId() {
+        DocumentQuery documentQuery = new DocumentQuery();
+        documentQuery.setVerifierId(2L);
+        DocumentSearchResults searchResults = catalog.find(documentQuery);
+
+        assertThat(searchResults.getDocuments().size()).isEqualTo(2);
+        assertThat(searchResults.getDocuments().get(0).getNumber()).isEqualTo("1");
+        assertThat(searchResults.getDocuments().get(1).getNumber()).isEqualTo("4");
+    }
+
+    @Test
+    @Sql("/fixtures/documentByPhrase.sql")
+    @Transactional
+    public void shouldFindDocumentByPublisherId() {
+        DocumentQuery documentQuery = new DocumentQuery();
+        documentQuery.setPublisherId(1L);
+        DocumentSearchResults searchResults = catalog.find(documentQuery);
+
+        assertThat(searchResults.getDocuments().size()).isEqualTo(2);
+        assertThat(searchResults.getDocuments().get(0).getNumber()).isEqualTo("4");
+        assertThat(searchResults.getDocuments().get(1).getNumber()).isEqualTo("fancy");
     }
 
 }
