@@ -1,18 +1,22 @@
 package pl.com.bottega.dms.aceptance;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 import pl.com.bottega.dms.application.DocumentCatalog;
 import pl.com.bottega.dms.application.DocumentDto;
 import pl.com.bottega.dms.application.DocumentFlowProcess;
+import pl.com.bottega.dms.application.user.AuthProcess;
 import pl.com.bottega.dms.model.DocumentNumber;
 import pl.com.bottega.dms.model.EmployeeId;
 import pl.com.bottega.dms.model.commands.ChangeDocumentCommand;
 import pl.com.bottega.dms.model.commands.CreateDocumentCommand;
 import pl.com.bottega.dms.model.commands.PublishDocumentCommand;
+import pl.com.bottega.dms.shared.AuthHelper;
 
 import java.util.Arrays;
 
@@ -20,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
+@Transactional
 public class DocumentFlowTest {
 
     @Autowired
@@ -27,6 +32,17 @@ public class DocumentFlowTest {
 
     @Autowired
     private DocumentCatalog documentCatalog;
+
+    @Autowired
+    private AuthProcess authProcess;
+
+    @Autowired
+    private AuthHelper authHelper;
+
+    @Before
+    public void authenticate() {
+        authHelper.authenticate();
+    }
 
     @Test
     public void shouldCreateDocument() {

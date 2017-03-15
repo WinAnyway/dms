@@ -1,9 +1,8 @@
 package pl.com.bottega.dms.model.commands;
 
-import pl.com.bottega.dms.model.DocumentNumber;
 import pl.com.bottega.dms.model.EmployeeId;
 
-public class ChangeDocumentCommand {
+public class ChangeDocumentCommand implements EmployeeAware, Validatable{
     private String title;
     private String content;
     private EmployeeId employeeId;
@@ -39,5 +38,15 @@ public class ChangeDocumentCommand {
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    @Override
+    public void validate(ValidationErrors errors) {
+        if(title == null || title.isEmpty())
+            errors.add("title", "Can't be blank");
+        if(content == null || content.isEmpty())
+            errors.add("content", "Can't be blank");
+        if(number == null || number.isEmpty())
+            errors.add("number", "Can't be blank");
     }
 }

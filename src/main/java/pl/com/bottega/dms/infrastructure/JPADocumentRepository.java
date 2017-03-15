@@ -19,6 +19,11 @@ public class JPADocumentRepository implements DocumentRepository {
 
     @Override
     public Document get(DocumentNumber nr) {
-        return entityManager.find(Document.class, nr);
+        Document document = entityManager.find(Document.class, nr);
+
+        /*if(document == null)
+            throw new DocumentNotFoundException();*/
+
+        return document;
     }
 }

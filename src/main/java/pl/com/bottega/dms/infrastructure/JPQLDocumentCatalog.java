@@ -27,22 +27,25 @@ public class JPQLDocumentCatalog implements DocumentCatalog{
         DocumentSearchResults results = new DocumentSearchResults();
 
         String jpqlQuery = "SELECT d FROM Document d LEFT JOIN FETCH d.confirmations ";
+        String countJpqlQuery = "SELECT COUNT(d) FROM Document d ";
         Set<String> predicates = createPredicates(documentQuery);
 
         if(!predicates.isEmpty()) {
             String where = "WHERE " + StringUtils.join(predicates, " AND ");
             jpqlQuery += where;
+            countJpqlQuery += where;
         }
+
+        Query countQuery = entityManager.createQuery(countJpqlQuery);
         Query query = entityManager.createQuery(jpqlQuery);
         applyPredicateParameters(query, documentQuery);
+        applyPredicateParameters(countQuery, documentQuery);
         query.setFirstResult(getFirstResultOffset(documentQuery));
         query.setMaxResults(documentQuery.getPerPage());
 
         List<Document> documents = query.getResultList();
         List<DocumentDto> dtos = getDocumentDtos(documents);
 
-        String countJpqlQuery = "SELECT COUNT(d) FROM Document d";
-        Query countQuery = entityManager.createQuery(countJpqlQuery);
         Long total = (Long)countQuery.getSingleResult();
 
         results.setDocuments(dtos);

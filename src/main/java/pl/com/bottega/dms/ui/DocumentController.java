@@ -54,7 +54,7 @@ public class DocumentController {
         documentFlowProcess.verify(new DocumentNumber(documentNumber));
     }
 
-    @PostMapping("/{documentNumber}/destruction")
+    @PostMapping("/{documentNumber}/archivization")
     public void destroy(@PathVariable String documentNumber) {
         documentFlowProcess.archive(new DocumentNumber(documentNumber));
     }
@@ -66,14 +66,11 @@ public class DocumentController {
         readingConfirmator.confirm(cmd);
     }
 
-    @PostMapping("/{documentNumber}/confirmationFor/{employee}")
-    public void confirmFor(@PathVariable String documentNumber, @PathVariable String employee, ConfirmForDocumentCommand cmd) {
-        cmd.setConfirmingEmployeeId(new EmployeeId(1L));
-        cmd.setEmployeeId(new EmployeeId(Long.valueOf(employee)));
+    @PostMapping("/{documentNumber}/confirmationFor/{confirmingEmployee}")
+    public void confirmFor(@PathVariable String documentNumber, @PathVariable String confirmingEmployee, ConfirmForDocumentCommand cmd) {
+        cmd.setConfirmingEmployeeId(new EmployeeId(Long.valueOf(confirmingEmployee)));
         cmd.setNumber(documentNumber);
         readingConfirmator.confirmFor(cmd);
     }
-
-
 
 }
