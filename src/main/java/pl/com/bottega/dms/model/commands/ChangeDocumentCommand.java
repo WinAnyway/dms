@@ -46,7 +46,5 @@ public class ChangeDocumentCommand implements EmployeeAware, Validatable{
             errors.add("title", "Can't be blank");
         if(content == null || content.isEmpty())
             errors.add("content", "Can't be blank");
-        if(number == null || number.isEmpty())
-            errors.add("number", "Can't be blank");
     }
 }

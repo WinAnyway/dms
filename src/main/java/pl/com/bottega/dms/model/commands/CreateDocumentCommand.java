@@ -2,7 +2,7 @@ package pl.com.bottega.dms.model.commands;
 
 import pl.com.bottega.dms.model.EmployeeId;
 
-public class CreateDocumentCommand implements EmployeeAware{
+public class CreateDocumentCommand implements EmployeeAware, Validatable{
     private String title;
     private EmployeeId employeeId;
 
@@ -20,5 +20,11 @@ public class CreateDocumentCommand implements EmployeeAware{
 
     public EmployeeId getEmployeeId() {
         return employeeId;
+    }
+
+    @Override
+    public void validate(ValidationErrors errors) {
+        if(title == null && title.isEmpty())
+            errors.add("title", "Can't be blank");
     }
 }

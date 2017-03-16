@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.com.bottega.dms.application.user.AuthRequiredException;
+import pl.com.bottega.dms.infrastructure.DocumentNotFoundException;
 import pl.com.bottega.dms.model.DocumentStatusException;
 import pl.com.bottega.dms.model.commands.CommandInvalidException;
 import pl.com.bottega.dms.model.commands.Validatable;
@@ -14,11 +15,11 @@ import pl.com.bottega.dms.model.commands.Validatable;
 public class ErrorHandlers {
 
     @ExceptionHandler(AuthRequiredException.class)
-    public ResponseEntity<String> handleAuthRequiredException() {
+    public ResponseEntity<String> handleAuthRequiredException(AuthRequiredException ex) {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.CONTENT_TYPE, "application/json");
         return new ResponseEntity<String>(
-                "{\"error\": \"authentication_required\"}",
+                String.format("{\"error\": \"authentication_required\", \"details\": \"%s\"}", ex.getMessage()),
                 headers,
                 HttpStatus.UNAUTHORIZED
         );
@@ -46,7 +47,7 @@ public class ErrorHandlers {
         );
     }
 
-/*    @ExceptionHandler(DocumentNotFoundException.class)
+    @ExceptionHandler(DocumentNotFoundException.class)
     public ResponseEntity<String> handleDocumentNotFoundException() {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.CONTENT_TYPE, "application/json");
@@ -55,6 +56,6 @@ public class ErrorHandlers {
                 headers,
                 HttpStatus.NOT_FOUND
         );
-    }*/
+    }
 
 }

@@ -16,7 +16,7 @@ import pl.com.bottega.dms.model.numbers.NumberGenerator;
 import pl.com.bottega.dms.model.printing.PrintCostCalculator;
 
 @Transactional
-@RequiresAuth
+@RequiresAuth(roles = {"QUALITY_STAFF"})
 public class StandardDocumentFlowProcess implements DocumentFlowProcess {
 
     private NumberGenerator numberGenerator;

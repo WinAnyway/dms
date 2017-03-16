@@ -21,8 +21,8 @@ public class JPADocumentRepository implements DocumentRepository {
     public Document get(DocumentNumber nr) {
         Document document = entityManager.find(Document.class, nr);
 
-        /*if(document == null)
-            throw new DocumentNotFoundException();*/
+        if(document == null)
+            throw new DocumentNotFoundException();
 
         return document;
     }
