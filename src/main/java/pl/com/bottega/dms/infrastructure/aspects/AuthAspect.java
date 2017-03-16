@@ -19,21 +19,36 @@ public class AuthAspect {
         this.currentUser = currentUser;
     }
 
-    @Before("@within(requiresAuth)")
-    public void ensureAuth(RequiresAuth requiresAuth) {
+    @Before(value = "@within(requiresAuth)")
+    public void ensureAuthForClasses(RequiresAuth requiresAuth) {
         if (currentUser.getEmployeeId() == null)
             throw new AuthRequiredException("You need to be logged in for this action");
 
-        String[] roles;
-        if ((roles = requiresAuth.roles()) != null) {
-            Set<String> currentUserRoles = currentUser.getRoles();
+        String[] roles = requiresAuth.roles();
+        Set<String> currentUserRoles = currentUser.getRoles();
 
-            for (String role : roles) {
-                if (!currentUserRoles.contains(role)) {
-                    throw new AuthRequiredException("User lacks priveleges for this action");
-                }
+        for (String role : roles) {
+            if (!currentUserRoles.contains(role)) {
+                throw new AuthRequiredException("User lacks priveleges for this action");
             }
         }
+
+    }
+
+    @Before(value = "@annotation(requiresAuth)")
+    public void ensureAuthForMethods(RequiresAuth requiresAuth) {
+        if (currentUser.getEmployeeId() == null)
+            throw new AuthRequiredException("You need to be logged in for this action");
+
+        String[] roles = requiresAuth.roles();
+        Set<String> currentUserRoles = currentUser.getRoles();
+
+        for (String role : roles) {
+            if (!currentUserRoles.contains(role)) {
+                throw new AuthRequiredException("User lacks priveleges for this action");
+            }
+        }
+
     }
 
 }

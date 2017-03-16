@@ -16,7 +16,6 @@ import pl.com.bottega.dms.model.numbers.NumberGenerator;
 import pl.com.bottega.dms.model.printing.PrintCostCalculator;
 
 @Transactional
-@RequiresAuth(roles = {"QUALITY_STAFF"})
 public class StandardDocumentFlowProcess implements DocumentFlowProcess {
 
     private NumberGenerator numberGenerator;
@@ -35,6 +34,7 @@ public class StandardDocumentFlowProcess implements DocumentFlowProcess {
     }
 
     @Override
+    @RequiresAuth(roles = {"QUALITY_STAFF"})
     public DocumentNumber create(CreateDocumentCommand cmd) {
         Document document = new Document(cmd, numberGenerator);
         documentRepository.put(document);
@@ -42,6 +42,7 @@ public class StandardDocumentFlowProcess implements DocumentFlowProcess {
     }
 
     @Override
+    @RequiresAuth(roles = {"QUALITY_STAFF"})
     public void change(ChangeDocumentCommand cmd) {
         DocumentNumber documentNumber = new DocumentNumber(cmd.getNumber());
         Document document = documentRepository.get(documentNumber);
@@ -49,12 +50,14 @@ public class StandardDocumentFlowProcess implements DocumentFlowProcess {
     }
 
     @Override
+    @RequiresAuth(roles = {"QUALITY_STAFF"})
     public void verify(DocumentNumber documentNumber) {
         Document document = documentRepository.get(documentNumber);
         document.verify(currentUser.getEmployeeId());
     }
 
     @Override
+    @RequiresAuth(roles = {"STAFF_MANAGER"})
     public void publish(PublishDocumentCommand cmd) {
         DocumentNumber documentNumber = new DocumentNumber(cmd.getDocumentNumber());
         Document document = documentRepository.get(documentNumber);
@@ -63,6 +66,7 @@ public class StandardDocumentFlowProcess implements DocumentFlowProcess {
     }
 
     @Override
+    @RequiresAuth(roles = {"STAFF_MANAGER"})
     public void archive(DocumentNumber documentNumber) {
         Document document = documentRepository.get(documentNumber);
         document.archive(currentUser.getEmployeeId());
