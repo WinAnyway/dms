@@ -21,25 +21,24 @@ public class AuthAspect {
 
     @Before(value = "@within(requiresAuth)")
     public void ensureAuthForClasses(RequiresAuth requiresAuth) {
-        if (currentUser.getEmployeeId() == null)
-            throw new AuthRequiredException("You need to be logged in for this action");
-
-        String[] roles = requiresAuth.roles();
-        Set<String> currentUserRoles = currentUser.getRoles();
-
-        for (String role : roles) {
-            if (!currentUserRoles.contains(role)) {
-                throw new AuthRequiredException("User lacks priveleges for this action");
-            }
-        }
+        checkIfUserIsLoggedIn();
+        checkIfUserHasProperRoles(requiresAuth);
 
     }
 
     @Before(value = "@annotation(requiresAuth)")
     public void ensureAuthForMethods(RequiresAuth requiresAuth) {
+        checkIfUserIsLoggedIn();
+        checkIfUserHasProperRoles(requiresAuth);
+
+    }
+
+    private void checkIfUserIsLoggedIn() {
         if (currentUser.getEmployeeId() == null)
             throw new AuthRequiredException("You need to be logged in for this action");
+    }
 
+    private void checkIfUserHasProperRoles(RequiresAuth requiresAuth) {
         String[] roles = requiresAuth.roles();
         Set<String> currentUserRoles = currentUser.getRoles();
 
@@ -48,7 +47,6 @@ public class AuthAspect {
                 throw new AuthRequiredException("User lacks priveleges for this action");
             }
         }
-
     }
 
 }
