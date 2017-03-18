@@ -1,7 +1,6 @@
 package pl.com.bottega.dms.model;
 
 import pl.com.bottega.dms.model.commands.*;
-import pl.com.bottega.dms.model.numbers.NumberGenerator;
 import pl.com.bottega.dms.model.printing.PrintCostCalculator;
 
 import javax.persistence.*;
@@ -47,8 +46,8 @@ public class Document {
     Document() {
     }
 
-    public Document(CreateDocumentCommand cmd, NumberGenerator numberGenerator) {
-        this.number = numberGenerator.generate();
+    public Document(CreateDocumentCommand cmd, DocumentNumber documentNumber) {
+        this.number = documentNumber;
         this.status = DRAFT;
         this.title = cmd.getTitle();
         this.createdAt = LocalDateTime.now();

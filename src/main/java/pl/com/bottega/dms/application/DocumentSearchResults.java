@@ -25,7 +25,6 @@ public class DocumentSearchResults {
         this.pagesCount = pagesCount;
     }
 
-
     public Integer getPageNumber() {
         return pageNumber;
     }

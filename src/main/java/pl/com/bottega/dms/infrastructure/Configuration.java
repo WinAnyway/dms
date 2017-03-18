@@ -4,6 +4,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.scheduling.annotation.AsyncConfigurerSupport;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import pl.com.bottega.dms.application.DocumentCatalog;
 import pl.com.bottega.dms.application.DocumentFlowProcess;
 import pl.com.bottega.dms.application.ReadingConfirmator;
@@ -14,23 +17,32 @@ import pl.com.bottega.dms.application.user.CurrentUser;
 import pl.com.bottega.dms.application.user.UserRepository;
 import pl.com.bottega.dms.application.user.impl.StandardAuthProcess;
 import pl.com.bottega.dms.application.user.impl.StandardCurrentUser;
+import pl.com.bottega.dms.model.DocumentFactory;
 import pl.com.bottega.dms.model.DocumentRepository;
 import pl.com.bottega.dms.model.numbers.ISONumberGenerator;
 import pl.com.bottega.dms.model.numbers.NumberGenerator;
 import pl.com.bottega.dms.model.printing.PrintCostCalculator;
 import pl.com.bottega.dms.model.printing.RGBPrintCostCalculator;
 
+import java.util.concurrent.Executor;
+
 @org.springframework.context.annotation.Configuration
-public class Configuration {
+@EnableAsync
+public class Configuration extends AsyncConfigurerSupport{
 
     @Bean
-    public DocumentFlowProcess documentFlowProcess(NumberGenerator numberGenerator,
+    public DocumentFlowProcess documentFlowProcess(DocumentFactory documentFactory,
                                                    PrintCostCalculator printCostCalculator,
                                                    DocumentRepository documentRepository,
                                                    CurrentUser currentUser,
                                                    ApplicationEventPublisher publisher
     ) {
-        return new StandardDocumentFlowProcess(numberGenerator, printCostCalculator, documentRepository, currentUser, publisher);
+        return new StandardDocumentFlowProcess(documentFactory, printCostCalculator, documentRepository, currentUser, publisher);
+    }
+
+    @Bean
+    public DocumentFactory documentFactory(NumberGenerator numberGenerator) {
+        return new DocumentFactory(numberGenerator);
     }
 
     @Bean
@@ -73,5 +85,18 @@ public class Configuration {
     public ReadingConfirmator readingConfirmator(DocumentRepository repo) {
         return new StandardReadingConfirmator(repo);
     }
+
+    @Override
+    public Executor getAsyncExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(2);
+        executor.setQueueCapacity(500);
+        executor.setThreadNamePrefix("DMS-Async-Executor");
+        executor.initialize();
+        return executor;
+    }
+
+
 
 }

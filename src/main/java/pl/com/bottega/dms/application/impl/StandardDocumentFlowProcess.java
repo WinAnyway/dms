@@ -1,32 +1,33 @@
 package pl.com.bottega.dms.application.impl;
 
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.com.bottega.dms.application.DocumentFlowProcess;
 import pl.com.bottega.dms.application.user.CurrentUser;
 import pl.com.bottega.dms.application.user.RequiresAuth;
 import pl.com.bottega.dms.model.Document;
+import pl.com.bottega.dms.model.DocumentFactory;
 import pl.com.bottega.dms.model.DocumentNumber;
 import pl.com.bottega.dms.model.DocumentRepository;
 import pl.com.bottega.dms.model.commands.ChangeDocumentCommand;
 import pl.com.bottega.dms.model.commands.CreateDocumentCommand;
 import pl.com.bottega.dms.model.commands.PublishDocumentCommand;
 import pl.com.bottega.dms.model.events.DocumentPublishEvent;
-import pl.com.bottega.dms.model.numbers.NumberGenerator;
 import pl.com.bottega.dms.model.printing.PrintCostCalculator;
 
-@Transactional
+@Transactional(isolation = Isolation.REPEATABLE_READ)
 public class StandardDocumentFlowProcess implements DocumentFlowProcess {
 
-    private NumberGenerator numberGenerator;
+    private DocumentFactory documentFactory;
     private PrintCostCalculator printCostCalculator;
     private DocumentRepository documentRepository;
     private CurrentUser currentUser;
     private ApplicationEventPublisher publisher;
 
-    public StandardDocumentFlowProcess(NumberGenerator numberGenerator, PrintCostCalculator printCostCalculator,
+    public StandardDocumentFlowProcess(DocumentFactory documentFactory, PrintCostCalculator printCostCalculator,
                                        DocumentRepository documentRepository, CurrentUser currentUser, ApplicationEventPublisher publisher) {
-        this.numberGenerator = numberGenerator;
+        this.documentFactory = documentFactory;
         this.printCostCalculator = printCostCalculator;
         this.documentRepository = documentRepository;
         this.currentUser = currentUser;
@@ -36,7 +37,7 @@ public class StandardDocumentFlowProcess implements DocumentFlowProcess {
     @Override
     @RequiresAuth(roles = {"QUALITY_STAFF"})
     public DocumentNumber create(CreateDocumentCommand cmd) {
-        Document document = new Document(cmd, numberGenerator);
+        Document document = documentFactory.createDocument(cmd);
         documentRepository.put(document);
         return document.getNumber();
     }
