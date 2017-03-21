@@ -4,9 +4,9 @@ import com.sun.deploy.util.StringUtils;
 import org.springframework.stereotype.Component;
 import pl.com.bottega.dms.application.*;
 import pl.com.bottega.dms.model.Confirmation;
-import pl.com.bottega.dms.model.Document;
-import pl.com.bottega.dms.model.DocumentNumber;
-import pl.com.bottega.dms.model.DocumentStatus;
+import pl.com.bottega.dms.model.document.Document;
+import pl.com.bottega.dms.model.document.DocumentNumber;
+import pl.com.bottega.dms.model.document.DocumentStatus;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

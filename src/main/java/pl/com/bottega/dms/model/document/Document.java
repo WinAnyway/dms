@@ -1,5 +1,6 @@
-package pl.com.bottega.dms.model;
+package pl.com.bottega.dms.model.document;
 
+import pl.com.bottega.dms.model.*;
 import pl.com.bottega.dms.model.commands.*;
 import pl.com.bottega.dms.model.printing.PrintCostCalculator;
 
@@ -10,38 +11,46 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static pl.com.bottega.dms.model.DocumentStatus.*;
+import static pl.com.bottega.dms.model.document.DocumentStatus.*;
 
 @Entity
 public class Document {
 
+    private static final int CHARS_COUNT_PER_PAGE = 1800;
+
+    @Transient
+    DocumentState documentState;
+
     @EmbeddedId
     private DocumentNumber number;
     @Enumerated(EnumType.STRING)
-    private DocumentStatus status;
-    private String title;
-    private String content;
-    private LocalDateTime createdAt;
-    private LocalDateTime verifiedAt;
-    private LocalDateTime publishedAt;
-    private LocalDateTime changedAt;
+    DocumentStatus status;
+    @Enumerated(EnumType.STRING)
+    DocumentType type;
+    String title;
+    String content;
+    LocalDateTime createdAt;
+    LocalDateTime verifiedAt;
+    LocalDateTime publishedAt;
+    LocalDateTime changedAt;
+    LocalDateTime expiresAt;
     @Embedded
     @AttributeOverride(name = "id", column = @Column(name = "creatorId"))
     private EmployeeId creatorId;
     @Embedded
     @AttributeOverride(name = "id", column = @Column(name = "verifierId"))
-    private EmployeeId verifierId;
+    EmployeeId verifierId;
     @Embedded
     @AttributeOverride(name = "id", column = @Column(name = "editorId"))
-    private EmployeeId editorId;
+    EmployeeId editorId;
     @Embedded
     @AttributeOverride(name = "id", column = @Column(name = "publisherId"))
-    private EmployeeId publisherId;
-    private BigDecimal printCost;
+    EmployeeId publisherId;
+    BigDecimal printCost;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "documentNumber")
-    private Set<Confirmation> confirmations;
+    Set<Confirmation> confirmations;
 
     Document() {
     }
@@ -49,32 +58,35 @@ public class Document {
     public Document(CreateDocumentCommand cmd, DocumentNumber documentNumber) {
         this.number = documentNumber;
         this.status = DRAFT;
+        this.documentState = new DraftState(this);
+        this.type = cmd.getDocumentType();
         this.title = cmd.getTitle();
         this.createdAt = LocalDateTime.now();
         this.creatorId = cmd.getEmployeeId();
         this.confirmations = new HashSet<>();
     }
 
+    public void export(DocumentBuiler builder) {
+        builder.buildTitle(title);
+        builder.buildContent(content);
+        builder.buildNumber(number);
+        builder.buildStatus(status);
+        builder.buildType(type);
+        builder.buildCreatedAt(createdAt);
+        for (Confirmation confirmation : confirmations)
+            builder.buildConfirmation(confirmation.getOwner(), confirmation.getProxy(), confirmation.getConfirmationDate());
+    }
+
     public void change(ChangeDocumentCommand cmd) {
-        if (!this.status.equals(DRAFT) && !this.status.equals(VERIFIED))
-            throw new DocumentStatusException("Document should be DRAFT or VERIFIED to PUBLISH");
-        this.title = cmd.getTitle();
-        this.content = cmd.getContent();
-        this.status = DRAFT;
-        this.changedAt = LocalDateTime.now();
-        this.editorId = cmd.getEmployeeId();
+        documentState.change(cmd);
     }
 
     public void verify(EmployeeId employeeId) {
-        if (!this.status.equals(DRAFT))
-            throw new DocumentStatusException("Document should be DRAFT to VERIFY");
-        this.status = VERIFIED;
-        this.verifiedAt = LocalDateTime.now();
-        this.verifierId = employeeId;
+        documentState.verify(employeeId);
     }
 
     public void archive(EmployeeId employeeId) {
-        this.status = ARCHIVED;
+        documentState.archive(employeeId);
     }
 
     public void publish(PublishDocumentCommand cmd, PrintCostCalculator printCostCalculator) {
@@ -105,6 +117,10 @@ public class Document {
 
     public DocumentStatus getStatus() {
         return status;
+    }
+
+    public DocumentType getType() {
+        return type;
     }
 
     public DocumentNumber getNumber() {
@@ -155,8 +171,15 @@ public class Document {
         return printCost;
     }
 
-    public void setPrintCost(BigDecimal printCost) {
-        this.printCost = printCost;
+    public LocalDateTime getExpiresAt() {
+        return expiresAt;
+    }
+
+    public int getPagesCount() {
+        if (content == null)
+            return 0;
+        return content.length() / CHARS_COUNT_PER_PAGE +
+                (content.length() % CHARS_COUNT_PER_PAGE == 0 ? 0 : 1);
     }
 
     public boolean isConfirmedBy(EmployeeId employeeId) {

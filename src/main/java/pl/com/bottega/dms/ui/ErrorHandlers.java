@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.com.bottega.dms.application.user.AuthRequiredException;
 import pl.com.bottega.dms.infrastructure.DocumentNotFoundException;
-import pl.com.bottega.dms.model.DocumentStatusException;
+import pl.com.bottega.dms.model.document.DocumentStatusException;
 import pl.com.bottega.dms.model.commands.CommandInvalidException;
 import pl.com.bottega.dms.model.commands.Validatable;
 

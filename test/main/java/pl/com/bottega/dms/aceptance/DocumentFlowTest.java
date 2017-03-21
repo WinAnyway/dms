@@ -11,13 +11,15 @@ import pl.com.bottega.dms.application.DocumentCatalog;
 import pl.com.bottega.dms.application.DocumentDto;
 import pl.com.bottega.dms.application.DocumentFlowProcess;
 import pl.com.bottega.dms.application.user.AuthProcess;
-import pl.com.bottega.dms.model.DocumentNumber;
+import pl.com.bottega.dms.model.document.DocumentNumber;
+import pl.com.bottega.dms.model.document.DocumentType;
 import pl.com.bottega.dms.model.EmployeeId;
 import pl.com.bottega.dms.model.commands.ChangeDocumentCommand;
 import pl.com.bottega.dms.model.commands.CreateDocumentCommand;
 import pl.com.bottega.dms.model.commands.PublishDocumentCommand;
 import pl.com.bottega.dms.shared.AuthHelper;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,6 +67,7 @@ public class DocumentFlowTest {
         changeDocumentCommand.setNumber(documentNumber.getNumber());
         changeDocumentCommand.setTitle("new title");
         changeDocumentCommand.setContent("new content");
+        changeDocumentCommand.setExpiresAt(LocalDateTime.now().plusDays(365L));
         documentFlowProcess.change(changeDocumentCommand);
 
         // then
@@ -103,6 +106,7 @@ public class DocumentFlowTest {
     public void shouldPublishDocument() {
         //given
         DocumentNumber documentNumber = createDocument();
+        updateDocument(documentNumber);
         documentFlowProcess.verify(documentNumber);
 
         //when
@@ -119,7 +123,17 @@ public class DocumentFlowTest {
     private DocumentNumber createDocument() {
         CreateDocumentCommand cmd = new CreateDocumentCommand();
         cmd.setTitle("test");
+        cmd.setDocumentType(DocumentType.MANUAL);
         return documentFlowProcess.create(cmd);
+    }
+
+    private void updateDocument(DocumentNumber nr) {
+        ChangeDocumentCommand cmd = new ChangeDocumentCommand();
+        cmd.setNumber(nr.getNumber());
+        cmd.setContent("blah blah");
+        cmd.setTitle("test");
+        cmd.setExpiresAt(LocalDateTime.now().plusDays(365L));
+        documentFlowProcess.change(cmd);
     }
 
 }

@@ -1,4 +1,4 @@
-package pl.com.bottega.dms.model;
+package pl.com.bottega.dms.model.document;
 
 import java.io.Serializable;
 

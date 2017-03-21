@@ -1,4 +1,4 @@
-package pl.com.bottega.dms.model;
+package pl.com.bottega.dms.model.document;
 
 import pl.com.bottega.dms.model.commands.CreateDocumentCommand;
 import pl.com.bottega.dms.model.numbers.NumberGenerator;

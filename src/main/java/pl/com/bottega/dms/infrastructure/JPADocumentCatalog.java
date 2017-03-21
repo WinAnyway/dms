@@ -3,9 +3,9 @@ package pl.com.bottega.dms.infrastructure;
 import pl.com.bottega.dms.application.*;
 import pl.com.bottega.dms.application.user.RequiresAuth;
 import pl.com.bottega.dms.model.Confirmation;
-import pl.com.bottega.dms.model.Document;
-import pl.com.bottega.dms.model.DocumentNumber;
-import pl.com.bottega.dms.model.DocumentStatus;
+import pl.com.bottega.dms.model.document.Document;
+import pl.com.bottega.dms.model.document.DocumentNumber;
+import pl.com.bottega.dms.model.document.DocumentStatus;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -195,28 +195,9 @@ public class JPADocumentCatalog implements DocumentCatalog {
     }
 
     private DocumentDto createDocumentDto(Document document) {
-        DocumentDto documentDto = new DocumentDto();
-        documentDto.setNumber(document.getNumber().getNumber());
-        documentDto.setTitle(document.getTitle());
-        documentDto.setContent(document.getContent());
-        documentDto.setStatus(document.getStatus().name());
-        documentDto.setCreatedAt(document.getCreatedAt());
-        List<ConfirmationDto> confirmationDtos = new LinkedList<>();
-        for (Confirmation confirmation : document.getConfirmations()) {
-            ConfirmationDto dto = createConfirmationDto(confirmation);
-            confirmationDtos.add(dto);
-        }
-        documentDto.setConfirmations(confirmationDtos);
-        return documentDto;
+        DocumentDtoBuilder builder = new DocumentDtoBuilder();
+        document.export(builder);
+        return builder.getResult();
     }
 
-    private ConfirmationDto createConfirmationDto(Confirmation confirmation) {
-        ConfirmationDto dto = new ConfirmationDto();
-        dto.setConfirmed(confirmation.isConfirmed());
-        dto.setConfirmedAt(confirmation.getConfirmationDate());
-        dto.setOwnerEmployeeId(confirmation.getOwner().getId());
-        if (confirmation.hasProxy())
-            dto.setProxyEmployeeId(confirmation.getProxy().getId());
-        return dto;
-    }
 }

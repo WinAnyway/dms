@@ -1,8 +1,6 @@
 package pl.com.bottega.dms.application;
 
-import pl.com.bottega.dms.model.DocumentNumber;
-
-import java.util.Collection;
+import pl.com.bottega.dms.model.document.DocumentNumber;
 
 public interface DocumentCatalog {
 

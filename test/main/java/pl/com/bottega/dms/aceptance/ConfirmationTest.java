@@ -8,14 +8,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import pl.com.bottega.dms.application.*;
-import pl.com.bottega.dms.model.DocumentNumber;
 import pl.com.bottega.dms.model.EmployeeId;
-import pl.com.bottega.dms.model.commands.ConfirmDocumentCommand;
-import pl.com.bottega.dms.model.commands.ConfirmForDocumentCommand;
-import pl.com.bottega.dms.model.commands.CreateDocumentCommand;
-import pl.com.bottega.dms.model.commands.PublishDocumentCommand;
+import pl.com.bottega.dms.model.commands.*;
+import pl.com.bottega.dms.model.document.DocumentNumber;
+import pl.com.bottega.dms.model.document.DocumentType;
 import pl.com.bottega.dms.shared.AuthHelper;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -84,6 +83,7 @@ public class ConfirmationTest {
 
     private DocumentNumber publishedDocument() {
         DocumentNumber documentNumber = createDocument();
+        updateDocument(documentNumber);
         documentFlowProcess.verify(documentNumber);
         PublishDocumentCommand publishDocumentCommand = new PublishDocumentCommand();
         publishDocumentCommand.setDocumentNumber(documentNumber.getNumber());
@@ -95,7 +95,17 @@ public class ConfirmationTest {
     private DocumentNumber createDocument() {
         CreateDocumentCommand cmd = new CreateDocumentCommand();
         cmd.setTitle("test");
+        cmd.setDocumentType(DocumentType.MANUAL);
         return documentFlowProcess.create(cmd);
+    }
+
+    private void updateDocument(DocumentNumber nr) {
+        ChangeDocumentCommand cmd = new ChangeDocumentCommand();
+        cmd.setNumber(nr.getNumber());
+        cmd.setContent("blah blah");
+        cmd.setTitle("test");
+        cmd.setExpiresAt(LocalDateTime.now().plusDays(365L));
+        documentFlowProcess.change(cmd);
     }
 
 }

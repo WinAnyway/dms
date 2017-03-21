@@ -2,7 +2,7 @@ package pl.com.bottega.dms.ui;
 
 import org.springframework.web.bind.annotation.*;
 import pl.com.bottega.dms.application.*;
-import pl.com.bottega.dms.model.DocumentNumber;
+import pl.com.bottega.dms.model.document.DocumentNumber;
 import pl.com.bottega.dms.model.EmployeeId;
 import pl.com.bottega.dms.model.commands.*;
 

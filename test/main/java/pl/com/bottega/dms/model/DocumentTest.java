@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import pl.com.bottega.dms.model.commands.*;
+import pl.com.bottega.dms.model.document.*;
 import pl.com.bottega.dms.model.printing.PrintCostCalculator;
 
 import java.math.BigDecimal;
@@ -16,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
-import static pl.com.bottega.dms.model.DocumentStatus.*;
+import static pl.com.bottega.dms.model.document.DocumentStatus.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DocumentTest {
@@ -43,6 +44,13 @@ public class DocumentTest {
         Document document = given().newDocument();
 
         assertEquals("test title", document.getTitle());
+    }
+
+    @Test
+    public void shouldRememberTypeAfterCreate() {
+        Document document = given().newDocument();
+
+        assertThat(document.getType()).isEqualTo(DocumentType.MANUAL);
     }
 
     @Test
@@ -379,6 +387,7 @@ public class DocumentTest {
             CreateDocumentCommand cmd = new CreateDocumentCommand();
             cmd.setTitle("test title");
             cmd.setEmployeeId(employeeId);
+            cmd.setDocumentType(DocumentType.MANUAL);
             return new Document(cmd, anyDocumentNumber());
         }
 

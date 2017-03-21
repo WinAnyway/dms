@@ -1,8 +1,8 @@
 package pl.com.bottega.dms.infrastructure;
 
-import pl.com.bottega.dms.model.Document;
-import pl.com.bottega.dms.model.DocumentNumber;
-import pl.com.bottega.dms.model.DocumentRepository;
+import pl.com.bottega.dms.model.document.Document;
+import pl.com.bottega.dms.model.document.DocumentNumber;
+import pl.com.bottega.dms.model.document.DocumentRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

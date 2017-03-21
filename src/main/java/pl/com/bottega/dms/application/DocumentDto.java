@@ -13,6 +13,7 @@ public class DocumentDto {
     private List<ConfirmationDto> confirmations;
     private Long creatorId;
     private LocalDateTime createdAt;
+    private String type;
 
     public String getTitle() {
         return title;
@@ -68,5 +69,13 @@ public class DocumentDto {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
     }
 }
