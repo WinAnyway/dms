@@ -1,7 +1,7 @@
 package pl.com.bottega.dms.application;
 
 import pl.com.bottega.dms.model.EmployeeId;
-import pl.com.bottega.dms.model.document.DocumentBuiler;
+import pl.com.bottega.dms.model.document.DocumentBuilder;
 import pl.com.bottega.dms.model.document.DocumentNumber;
 import pl.com.bottega.dms.model.document.DocumentStatus;
 import pl.com.bottega.dms.model.document.DocumentType;
@@ -9,7 +9,7 @@ import pl.com.bottega.dms.model.document.DocumentType;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 
-public class DocumentDtoBuilder implements DocumentBuiler {
+public class DocumentDtoBuilder implements DocumentBuilder {
 
     private DocumentDto documentDto = new DocumentDto();
 
@@ -60,5 +60,10 @@ public class DocumentDtoBuilder implements DocumentBuiler {
         confirmationDto.setConfirmedAt(confirmationDate);
         confirmationDto.setConfirmed(confirmationDate != null);
         documentDto.getConfirmations().add(confirmationDto);
+    }
+
+    @Override
+    public void buildCreatorId(EmployeeId creatorId) {
+        documentDto.setCreatorId(creatorId.getId());
     }
 }

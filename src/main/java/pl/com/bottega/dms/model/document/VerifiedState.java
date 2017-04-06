@@ -50,6 +50,7 @@ public class VerifiedState implements DocumentState {
         document.publisherId = cmd.getEmployeeId();
         document.printCost = printCostCalculator.calculateCost(document);
         createConfirmations(cmd);
+        document.documentState = new PublishedState(document);
     }
 
     private void createConfirmations(PublishDocumentCommand cmd) {

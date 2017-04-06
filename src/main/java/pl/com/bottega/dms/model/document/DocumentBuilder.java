@@ -4,7 +4,7 @@ import pl.com.bottega.dms.model.EmployeeId;
 
 import java.time.LocalDateTime;
 
-public interface DocumentBuiler {
+public interface DocumentBuilder {
 
     void buildNumber(DocumentNumber documentNumber);
 
@@ -19,4 +19,6 @@ public interface DocumentBuiler {
     void buildCreatedAt(LocalDateTime createdAt);
 
     void buildConfirmation(EmployeeId owner, EmployeeId proxy, LocalDateTime confirmationDate);
+
+    void buildCreatorId(EmployeeId creatorId);
 }

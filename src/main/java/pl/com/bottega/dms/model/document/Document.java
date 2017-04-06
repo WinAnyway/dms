@@ -55,6 +55,26 @@ public class Document {
     Document() {
     }
 
+    @PostLoad
+    private void specifyState() {
+        switch (status.name()) {
+            case "DRAFT":
+                documentState = new DraftState(this);
+                break;
+            case "VERIFIED":
+                documentState = new VerifiedState(this);
+                break;
+            case "PUBLISHED":
+                documentState = new PublishedState(this);
+                break;
+            case "ARCHIVED":
+                documentState = new ArchivedState(this);
+                break;
+            default:
+                throw new DocumentStatusException("There is no DocumentStatus specified");
+        }
+    }
+
     public Document(CreateDocumentCommand cmd, DocumentNumber documentNumber) {
         this.number = documentNumber;
         this.status = DRAFT;
@@ -66,13 +86,14 @@ public class Document {
         this.confirmations = new HashSet<>();
     }
 
-    public void export(DocumentBuiler builder) {
+    public void export(DocumentBuilder builder) {
         builder.buildTitle(title);
         builder.buildContent(content);
         builder.buildNumber(number);
         builder.buildStatus(status);
         builder.buildType(type);
         builder.buildCreatedAt(createdAt);
+        builder.buildCreatorId(creatorId);
         for (Confirmation confirmation : confirmations)
             builder.buildConfirmation(confirmation.getOwner(), confirmation.getProxy(), confirmation.getConfirmationDate());
     }
@@ -90,13 +111,7 @@ public class Document {
     }
 
     public void publish(PublishDocumentCommand cmd, PrintCostCalculator printCostCalculator) {
-        if (!this.status.equals(VERIFIED))
-            throw new DocumentStatusException("Document should be VERIFIED to PUBLISH");
-        this.status = PUBLISHED;
-        this.publishedAt = LocalDateTime.now();
-        this.publisherId = cmd.getEmployeeId();
-        this.printCost = printCostCalculator.calculateCost(this);
-        createConfirmations(cmd);
+        documentState.publish(cmd, printCostCalculator);
     }
 
     private void createConfirmations(PublishDocumentCommand cmd) {
